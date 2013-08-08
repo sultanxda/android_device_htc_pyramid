@@ -52,11 +52,6 @@ ro.max.fling_velocity=12000
 ro.min.fling_velocity=8000
 view.scroll_friction=0
 #
-# GooManger
-#
-ro.goo.developerid=Albinoman887
-ro.goo.rom=AlbinoCM
-#
 #### AUTO-ROTATE LOCKSCREEN ####
 # (uncomment below line to enable)
 #lockscreen.rot_override=true
