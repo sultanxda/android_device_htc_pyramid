@@ -91,10 +91,6 @@ BOARD_EGL_CFG := device/htc/msm8660-common/configs/egl.cfg
 TARGET_PROVIDES_LIBLIGHT := true
 TARGET_PROVIDES_LIBLIGHTS := true
 
-# Recovery
-TARGET_RECOVERY_FSTAB := device/htc/pyramid/ramdisk/fstab.pyramid
-RECOVERY_FSTAB_VERSION := 2
-
 # Webkit
 ENABLE_WEBGL := true
 TARGET_FORCE_CPU_UPLOAD := true
