@@ -1,4 +1,4 @@
-# Copyright (C) 2012 The CyanogenMod Project
+# Copyright (C) 2009 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,85 +12,49 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-BOARD_VENDOR := htc
+#
+# This file sets variables that control the way modules are built
+# thorughout the system. It should not be used to conditionally
+# disable makefiles (the proper mechanism to control what gets
+# included in a build is to use PRODUCT_PACKAGES in a product
+# definition file).
+#
 
-TARGET_SPECIFIC_HEADER_PATH := device/htc/msm8660-common/include
+# inherit from common msm8660
+-include device/htc/msm8660-common/BoardConfigCommon.mk
 
 # Bootloader
-TARGET_NO_BOOTLOADER := true
+TARGET_BOOTLOADER_BOARD_NAME := pyramid
 
-# Kernel
-TARGET_KERNEL_SOURCE := /home/sultan/sultan-kernel-bruce-linaro3
+# Kernel [Settings]
+BOARD_KERNEL_BASE := 0x48000000
+BOARD_KERNEL_PAGE_SIZE := 2048
+BOARD_KERNEL_CMDLINE := console=ttyHSL0 androidboot.hardware=pyramid no_console_suspend=1
 
-# Platform
-TARGET_BOARD_PLATFORM := msm8660
-TARGET_BOARD_PLATFORM_GPU := qcom-adreno200
+# Kernel [Build]
+TARGET_KERNEL_CONFIG := sultan_defconfig
+#TARGET_KERNEL_CUSTOM_TOOLCHAIN := linaro-arm-cortex-a8
+#TARGET_KERNEL_CUSTOM_TOOLCHAIN_SUFFIX := arm-cortex_a8-linux-gnueabi
+BUILD_KERNEL := true
 
-# Architecture
-TARGET_CPU_VARIANT := cortex-a8
-TARGET_CPU_ABI := armeabi-v7a
-TARGET_CPU_ABI2 := armeabi
-TARGET_ARCH := arm
-TARGET_USES_ION := true
-TARGET_ARCH_VARIANT := armv7-a-neon
-TARGET_CPU_SMP := true
-ARCH_ARM_HAVE_TLS_REGISTER := true
-TARGET_HARDWARE_3D := true
-BOARD_USES_GENLOCK := true
-TARGET_USE_SCORPION_BIONIC_OPTIMIZATION := true
-ARCH_ARM_HAVE_VFP := true
-ARCH_ARM_HAVE_NEON := true
-TARGET_ENABLE_QC_AV_ENHANCEMENTS := true
+# Bluetooth/Wifi
+-include device/htc/msm8660-common/bcmdhd.mk
 
-# Compiler Optimization
-ARCH_ARM_HIGH_OPTIMIZATION := true
-ARCH_ARM_HIGH_OPTIMIZATION_COMPAT := true  
-
-# Flags
-COMMON_GLOBAL_CFLAGS += -DQCOM_HARDWARE
-
-# FB legacy
-BOARD_EGL_NEEDS_LEGACY_FB := true
-
-# QCOM hardware
-BOARD_USES_QCOM_HARDWARE := true
-TARGET_QCOM_DISPLAY_VARIANT := legacy
-
-# Audio
-COMMON_GLOBAL_CFLAGS += -DHTC_ACOUSTIC_AUDIO -DLEGACY_QCOM_VOICE
-TARGET_QCOM_AUDIO_VARIANT := caf
-BOARD_USES_LEGACY_ALSA_AUDIO := true
-
-# Bluetooth
-BOARD_HAVE_BLUETOOTH := true
-BOARD_HAVE_BLUETOOTH_BCM := true
-BOARD_BLUEDROID_VENDOR_CONF := device/htc/msm8660-common/bluetooth/vnd_msm8660.txt
-BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := device/htc/msm8660-common/bluetooth/include
-
-# Filesystem
-BOARD_VOLD_MAX_PARTITIONS := 36
+# Qcom GPS
+BOARD_VENDOR_QCOM_GPS_LOC_API_HARDWARE := pyramid
 
 # FM Radio
-# 4.2 -> commenting these for audio policy
-#BOARD_HAVE_QCOM_FM := true
-#COMMON_GLOBAL_CFLAGS += -DQCOM_FM_ENABLED
+BOARD_HAVE_FM_RADIO := true
+BOARD_GLOBAL_CFLAGS += -DHAVE_FM_RADIO
 
-# GPS
-BOARD_USES_QCOM_GPS := true
-BOARD_VENDOR_QCOM_GPS_LOC_API_AMSS_VERSION := 50000
+# RIL
+BOARD_USES_LEGACY_RIL := true
 
-# Graphics
-COMMON_GLOBAL_CFLAGS += -DQCOM_NO_SECURE_PLAYBACK -DREFRESH_RATE=60 -DHTC_RGBA_8888_OFFSET
-USE_OPENGL_RENDERER := true
-TARGET_NO_HW_VSYNC := true
-TARGET_USES_C2D_COMPOSITION := true
-BOARD_EGL_CFG := device/htc/msm8660-common/configs/egl.cfg
 
-# Lights
-# legacy LIBLIGHT naming
-TARGET_PROVIDES_LIBLIGHT := true
-TARGET_PROVIDES_LIBLIGHTS := true
-
-# Webkit
-ENABLE_WEBGL := true
-TARGET_FORCE_CPU_UPLOAD := true
+# Filesystem
+TARGET_USERIMAGES_USE_EXT4 := true
+BOARD_BOOTIMAGE_PARTITION_SIZE := 16777216
+BOARD_RECOVERYIMAGE_PARTITION_SIZE := 16776192
+BOARD_SYSTEMIMAGE_PARTITION_SIZE := 838859776
+BOARD_USERDATAIMAGE_PARTITION_SIZE := 1252770816
+BOARD_FLASH_BLOCK_SIZE := 262144
