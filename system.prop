@@ -53,9 +53,10 @@ ro.min.fling_velocity=8000
 view.scroll_friction=0
 #
 # GooManger
+# NOTE: I name my roms afer alice in chains albums :)
 #
 ro.goo.developerid=Albinoman887
-ro.goo.rom=AlbinoCM
+ro.goo.rom=Jar-of-Flies
 #
 #### AUTO-ROTATE LOCKSCREEN ####
 # (uncomment below line to enable)
