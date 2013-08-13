@@ -1,0 +1,10 @@
+bin/ipd
+bin/netsharing
+etc/agps_rm
+etc/vpimg
+lib/hw/sensors.pyramid.so
+lib/libchromatix_s5k3h1gx_default_video.so
+lib/libchromatix_s5k3h1gx_hfr.so
+lib/libchromatix_s5k3h1gx_preview.so
+lib/libchromatix_s5k3h1gx_zsl.so
+lib/libmpl_jni.so
