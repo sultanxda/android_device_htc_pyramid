@@ -179,6 +179,11 @@ on boot
 
     # allow Torch to write to flashlight file
     chmod 0777 /sys/class/leds/flashlight/brightness
+
+    # allow Camera to access max_brightness file
+    chmod 0777 /sys/class/leds/flashlight/max_brightness
+
+
 # Services start here
 
 service dhcpcd_wlan0 /system/bin/dhcpcd -ABKL
