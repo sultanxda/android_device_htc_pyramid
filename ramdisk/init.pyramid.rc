@@ -169,19 +169,21 @@ on boot
     chown system system /sys/devices/platform/panel_3d/3D_mode
     chmod 0664 /sys/devices/platform/panel_3d/3D_mode
 
-    # sync fs
-    chown system /sys/devices/platform/rs300000a7.65536/force_sync
-    chown system /sys/devices/platform/rs300000a7.65536/sync_sts
-
     # flashlight
     chown system camera /sys/class/leds/flashlight/brightness
 
     # allow Torch to write to flashlight file
     chmod 0777 /sys/class/leds/flashlight/brightness
 
-    # allow Camera to access max_brightness file
+    # fix Camera crashing phone when taking photo with flash
     chmod 0777 /sys/class/leds/flashlight/max_brightness
+    write /sys/class/leds/flashlight/max_brightness 3
+    chmod 0444 /sys/class/leds/flashlight/max_brightness
+    chown system camera /sys/class/leds/flashlight/max_brightness
 
+    # sync fs
+    chown system /sys/devices/platform/rs300000a7.65536/force_sync
+    chown system /sys/devices/platform/rs300000a7.65536/sync_sts
 
 # Services start here
 
