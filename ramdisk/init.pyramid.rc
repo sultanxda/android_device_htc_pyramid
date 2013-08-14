@@ -133,7 +133,7 @@ on boot
 
     # flashlight
     chown system camera /sys/class/leds/flashlight/brightness
-    chmod 0660          /sys/class/leds/flashlight/brightness
+    chmod 0666          /sys/class/leds/flashlight/brightness
 
     # Kernel init script - kernel config
     chmod 0777          /system/etc/init.d/99kernel
