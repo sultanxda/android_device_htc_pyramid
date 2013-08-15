@@ -13,7 +13,7 @@
 #  badass
 #  ondemand
 #  interactive
-#= lagfee
+#  lagfee
 #  performance
 GOV=ondemand
 
@@ -22,16 +22,17 @@ GOV=ondemand
 # deadline
 # cfq
 # noop
+# bfq (default)
 # vr 
-# sio (default)
-IO=sio
+# sio
+IO=bfq
 
 
 # Config CPU max frequency
 # Default: 1566000 (1566Mhtz)
 # Overclockable to - 1836000 (1836Mhtz)
 # for badass set to 1566mhtz (best performance/battery life)
-MAXFREQ=1566000
+MAXFREQ=1512000
 
 
 # Config CPU min frequency
@@ -76,21 +77,13 @@ SWEEP=0
 # 0 = disabled
 # 1 = substitute AC to USB charging always
 # 2 = substitute AC to USB charging only if there is no USB peripheral detected
-FASTCHARGE=1
+FASTCHARGE=0
 
 
 # Fsync Control
-# Disabled by default (recomended)
 # 2 = Fsync disabled
 # 1 = Fsync enabled
-FSYNC=2
-
-
-# TUN
-# Disabled by default
-# 0 = Disabled
-# 1 = Enabled
-TUN=0
+FSYNC=1
 
 
 # End of configurable options #
