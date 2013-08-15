@@ -1,7 +1,7 @@
 #!/system/bin/sh
 #Script originally made by Axetilen. Modified by Sultan (android1234567)
-#Updated for albinoman887's ChronicKernel (98% of the credit goes to android1234567. Thanks so much man :)
-#Updated for ChronicKernel-linaro
+#Then updated for albinoman887's ChronicKernel (98% of the credit goes to android1234567. Thanks so much man :)
+#Now updated again by Sultan (android1234567) for Sultan kernel
 
 # Configure your options here #
 
@@ -29,32 +29,32 @@ IO=deadline
 
 
 # Config CPU max frequency
-# Default: 1566000 (1566Mhtz)
-# Overclockable to - 1836000 (1836Mhtz)
+# Default: 1566000 (1566MHz)
+# Overclockable to - 1836000 (1836MHz)
 # for badass set to 1566mhtz (best performance/battery life)
 MAXFREQ=1512000
 
 
 # Config CPU min frequency
-# Default: 384000 (384Mhtz)
-# Range 384000 - 1944000 (384Mhtz - 1944Mhtz)
+# Default: 384000 (384MHz)
+# Range 384000 - 1944000 (384MHz - 1944MHz)
 MINFREQ=384000
 
 
 # Config 3D GPU clock
-# 228571000 = 228mhz
-# 266667000 = 267mhz (default)
-# 300000000 = 300mhz (Recomended For balance of Performance and Battery life)
-# 320000000 = 320mhz
+# 228571000 = 228MHz
+# 266667000 = 267MHz (default)
+# 300000000 = 300MHz (Recomended For balance of Performance and Battery life)
+# 320000000 = 320MHz
 GPU=266667000
 
 
 # Config 2D GPU clock
-# 145455000 = 145mhz
-# 160000000 = 160mhz
-# 200000000 = 200mhz (default)
-# 228571000 = 228mhz (Recomended For balance of Performance and Battery life)
-# 266667000 = 267mhz
+# 145455000 = 145MHz
+# 160000000 = 160MHz
+# 200000000 = 200MHz (default)
+# 228571000 = 228MHz (Recomended For balance of Performance and Battery life)
+# 266667000 = 267MHz
 DD=200000000
 
 
@@ -192,7 +192,7 @@ echo ${CUR_GOV} > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
     echo $MINFREQ > /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq
 
 
-# Config i/o scheduler
+# Config I/O scheduler
     chmod 644 /sys/block/mmcblk0/queue/scheduler
     echo "$IO" > /sys/block/mmcblk0/queue/scheduler
     chmod 644 /sys/block/mmcblk1/queue/scheduler
@@ -203,13 +203,4 @@ echo ${CUR_GOV} > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
 if [ "$FSYNC" = "2" ]
 then
     echo "0" > sys/class/misc/fsynccontrol/fsync_enabled
-fi
-
-
-# Config TUN
-if [ "${TUN}" = "1" ]; then
-	if [ -e /system/lib/modules/tun.ko ] ; then
-		insmod /system/lib/modules/tun.ko
-		$L "Inserted tun kernel module."
-	fi
 fi
