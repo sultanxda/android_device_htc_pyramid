@@ -19,13 +19,13 @@ GOV=ondemand
 
 
 # Config I/O scheduler
-# deadline
+# deadline (default)
 # cfq
 # noop
-# bfq (default)
+# bfq
 # vr 
 # sio
-IO=bfq
+IO=deadline
 
 
 # Config CPU max frequency
