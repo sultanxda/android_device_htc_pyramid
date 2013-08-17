@@ -53,7 +53,7 @@ PRODUCT_COPY_FILES += \
 
 # Some misc configuration files
 PRODUCT_COPY_FILES += \
-    device/htc/pyramid/configs/99kernel:system/etc/init.d/99kernel
+    device/htc/pyramid/configs/89kernel:system/etc/init.d/89kernel
 
 # Keylayouts and Keychars
 PRODUCT_COPY_FILES += \
