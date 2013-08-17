@@ -30,6 +30,10 @@ ro.ril.set.mtu1472=1
 wifi.interface=wlan0
 wifi.supplicant_scan_interval=160
 #
+# GooManager
+ro.goo.developerid=sultanxda
+ro.goo.rom=SultanCMpyramid
+#
 # Power Saving/Sleep
 #
 ro.ril.disable.power.collapse=0
