@@ -12,7 +12,7 @@ ro.telephony.ril.v3=datacallapn,signalstrength
 # T-Mobile data drop fix, uncomment if you have this issue
 # and delete above line
 #
-#ro.telephony.ril.v3=datacallapn,signalstrength,skipbrokendatacall 
+#ro.telephony.ril.v3=datacallapn,signalstrength,skipbrokendatacall
 ro.ril.enable.sdr=1
 ro.ril.enable.amr.wideband=0
 ro.ril.enable.a52.HTC-ITA=1
@@ -33,6 +33,7 @@ wifi.supplicant_scan_interval=160
 # GooManager
 ro.goo.developerid=sultanxda
 ro.goo.rom=SultanCMpyramid
+ro.goo.board=pyramid
 #
 # Power Saving/Sleep
 #

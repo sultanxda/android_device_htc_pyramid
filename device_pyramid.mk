@@ -114,7 +114,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
     ro.setupwizard.enable_bypass=1 \
     dalvik.vm.lockprof.threshold=500 \
     ro.com.google.locationfeatures=1 \
-    dalvik.vm.dexopt-flags=m=y
+    dalvik.vm.dexopt-flags=m=y \
+    ro.goo.version=$(shell date +%s)
 
 # call the proprietary setup
 $(call inherit-product-if-exists, vendor/htc/pyramid/pyramid-vendor.mk)
