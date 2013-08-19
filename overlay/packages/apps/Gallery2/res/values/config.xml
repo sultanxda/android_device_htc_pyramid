@@ -17,7 +17,7 @@
 <!-- camera app resources. -->
 <resources>
     <!-- HTC Camcorder Mode -->
-    <bool name="needsHTCCamMode">true</bool>
+    <!-- <bool name="needsHTCCamMode">true</bool> -->
 
     <!-- Allows setting video size before recording starts -->
     <bool name="needsEarlyVideoSize">true</bool>
