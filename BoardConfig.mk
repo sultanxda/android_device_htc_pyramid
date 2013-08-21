@@ -31,9 +31,6 @@ BOARD_KERNEL_BASE := 0x48000000
 BOARD_KERNEL_PAGE_SIZE := 2048
 BOARD_KERNEL_CMDLINE := console=ttyHSL0 androidboot.hardware=pyramid no_console_suspend=1
 
-# ROM Toolchain
-TARGET_GCC_VERSION_EXP := 4.6
-
 # Kernel [Build]
 TARGET_KERNEL_CONFIG := sultan_defconfig
 #TARGET_KERNEL_CUSTOM_TOOLCHAIN := linaro-arm-cortex-a8
