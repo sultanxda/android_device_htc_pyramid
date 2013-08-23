@@ -181,11 +181,6 @@ on boot
     chmod 0444 /sys/class/leds/flashlight/max_brightness
     chown system camera /sys/class/leds/flashlight/max_brightness
 
-    # disable kernel panic on oops
-    chmod 0666 /proc/sys/kernel/panic_on_oops
-    write /proc/sys/kernel/panic_on_oops 0
-    chmod 0444 /proc/sys/kernel/panic_on_oops
-
     # sync fs
     chown system /sys/devices/platform/rs300000a7.65536/force_sync
     chown system /sys/devices/platform/rs300000a7.65536/sync_sts
