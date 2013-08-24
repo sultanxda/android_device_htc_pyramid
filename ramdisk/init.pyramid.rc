@@ -192,6 +192,11 @@ service dhcpcd_wlan0 /system/bin/dhcpcd -ABKL
     disabled
     oneshot
 
+service dhcpcd_bt-pan /system/bin/dhcpcd -ABKL
+    class main
+    disabled
+    oneshot
+
 service hdmid /system/bin/hdmid
     class main
     socket hdmid stream 0660 root system graphics
