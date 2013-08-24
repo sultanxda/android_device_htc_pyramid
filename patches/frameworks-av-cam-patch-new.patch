@@ -1,0 +1,288 @@
+From faaa1b3f22d095dd82f137815442eee850156c13 Mon Sep 17 00:00:00 2001
+From: tbalden <illespal@gmail.com>
+Date: Sat, 23 Mar 2013 23:06:45 +0100
+Subject: [PATCH] Camera: QCOM legacy definitions,HTC cam
+ switch,NO_UPDATE_PREVIEW
+
+Updating Camera parameters, and service with several
+compatibility patches:
+
+1., QCOM legacy CameraParameters and functions:
+Adding these will make ICS qcomm camera blobs work on JB 4.3.
+Use BOARD_USES_QCOM_LEGACY_CAM_PARAMS := true in BoardConfig
+to use this.
+
+Also fixes the problem of legacy qcom
+camera blobs with recent libcameraservice QCOM_HARDWARE changes,
+where the orientation is messed up on first
+preview: the fix is leaving out setPreviewWindow(window) for
+legacy qcomm cam blobs.
+
+2., Also adding NO_UPDATE_PREVIEW flag for legacy purposes.
+
+3., Adding adding the set orientation patch:
+Always set buffers orientation when setting the qcom camera preview window
+Fixes the rotated preview on TouchPad
+https://github.com/CyanogenMod/android_frameworks_base/commit/1a8e41a3c7434737db89b604352575f8b3109e7a
+
+4., camera: Full support for HTC camera switch
+
+5., Adding more parameters for HTC Explorer
+
+Change-Id: I2bfc72b8ef027665356788f1db7f96b31d037dbe
+---
+ camera/Android.mk                                  |  3 ++
+ camera/CameraParameters.cpp                        | 25 +++++++++++++
+ include/camera/CameraParameters.h                  | 42 ++++++++++++++++++++++
+ services/camera/libcameraservice/Android.mk        |  8 +++++
+ services/camera/libcameraservice/CameraClient.cpp  |  7 ++++
+ services/camera/libcameraservice/CameraService.cpp | 24 +++++++++++++
+ 6 files changed, 109 insertions(+)
+
+diff --git a/camera/Android.mk b/camera/Android.mk
+index 3ebb43c..75fced7 100644
+--- a/camera/Android.mk
++++ b/camera/Android.mk
+@@ -39,6 +39,9 @@ endif
+ ifeq ($(BOARD_USES_QCOM_HARDWARE),true)
+        LOCAL_CFLAGS += -DQCOM_HARDWARE
+ endif
++ifeq ($(BOARD_USES_QCOM_LEGACY_CAM_PARAMS),true)
++       LOCAL_CFLAGS += -DQCOM_LEGACY_CAM_PARAMS
++endif
+ 
+ LOCAL_MODULE:= libcamera_client
+ 
+diff --git a/camera/CameraParameters.cpp b/camera/CameraParameters.cpp
+index 1ae8c67..afafb46 100644
+--- a/camera/CameraParameters.cpp
++++ b/camera/CameraParameters.cpp
+@@ -354,6 +354,9 @@ const char CameraParameters::FOCUS_MODE_EDOF[] = "edof";
+ const char CameraParameters::FOCUS_MODE_CONTINUOUS_VIDEO[] = "continuous-video";
+ const char CameraParameters::FOCUS_MODE_CONTINUOUS_PICTURE[] = "continuous-picture";
+ #if defined(QCOM_HARDWARE)
++#ifdef QCOM_LEGACY_CAM_PARAMS
++const char CameraParameters::FOCUS_MODE_CONTINUOUS_CAMERA[] = "continuous-camera";
++#endif
+ const char CameraParameters::FOCUS_MODE_NORMAL[] = "normal";
+ 
+ 
+@@ -397,11 +400,26 @@ const char CameraParameters::SKIN_TONE_ENHANCEMENT_ENABLE[] = "enable";
+ const char CameraParameters::SKIN_TONE_ENHANCEMENT_DISABLE[] = "disable";
+ 
+ const char CameraParameters::KEY_SHARPNESS[] = "sharpness";
++#ifdef QCOM_LEGACY_CAM_PARAMS
++const char CameraParameters::KEY_MAX_SHARPNESS[] = "sharpness-max";
++const char CameraParameters::KEY_MIN_SHARPNESS[] = "sharpness-min";
++#else
+ const char CameraParameters::KEY_MAX_SHARPNESS[] = "max-sharpness";
++#endif
+ const char CameraParameters::KEY_CONTRAST[] = "contrast";
++#ifdef QCOM_LEGACY_CAM_PARAMS
++const char CameraParameters::KEY_MAX_CONTRAST[] = "contrast-max";
++const char CameraParameters::KEY_MIN_CONTRAST[] = "contrast-min";
++#else
+ const char CameraParameters::KEY_MAX_CONTRAST[] = "max-contrast";
++#endif
+ const char CameraParameters::KEY_SATURATION[] = "saturation";
++#ifdef QCOM_LEGACY_CAM_PARAMS
++const char CameraParameters::KEY_MAX_SATURATION[] = "saturation-max";
++const char CameraParameters::KEY_MIN_SATURATION[] = "saturation-min";
++#else
+ const char CameraParameters::KEY_MAX_SATURATION[] = "max-saturation";
++#endif
+ 
+ //Values for DENOISE
+ const char CameraParameters::DENOISE_OFF[] = "denoise-off";
+@@ -730,6 +748,13 @@ void CameraParameters::getSupportedPreviewSizes(Vector<Size> &sizes) const
+ }
+ 
+ #ifdef QCOM_HARDWARE
++#ifdef QCOM_LEGACY_CAM_PARAMS
++void CameraParameters::setPostviewSize(int width, int height)
++{
++    // dummy
++}
++#endif
++
+ void CameraParameters::getSupportedHfrSizes(Vector<Size> &sizes) const
+ {
+     const char *hfrSizesStr = get(KEY_SUPPORTED_HFR_SIZES);
+diff --git a/include/camera/CameraParameters.h b/include/camera/CameraParameters.h
+index eb9f3cb..3ec47e6 100644
+--- a/include/camera/CameraParameters.h
++++ b/include/camera/CameraParameters.h
+@@ -182,6 +182,20 @@ public:
+     static const char KEY_SUPPORTED_PREVIEW_FRAME_RATE_MODES[];
+     static const char KEY_PREVIEW_FRAME_RATE_AUTO_MODE[];
+     static const char KEY_PREVIEW_FRAME_RATE_FIXED_MODE[];
++#ifdef QCOM_LEGACY_CAM_PARAMS
++    static const char KEY_CAPTURE_MODE[];
++    static const char KEY_SUPPORTED_CAPTURE_MODES[];
++    static const char KEY_PICTURE_COUNT[];
++    static const char KEY_MAX_BURST_PICTURE_COUNT[];
++    static const char KEY_SUPPORTED_CONTINUOUS_AF[];
++    static const char KEY_SUPPORTED_CAF[];
++    static const char CAPTURE_MODE_NORMAL[];
++    static const char CAPTURE_MODE_BURST[];
++    static const char CAPTURE_MODE_CONTI_BURST[];
++    static const char CAPTURE_MODE_HDR[];
++    static const char CAPTURE_MODE_HJR[];
++    static const char CAPTURE_MODE_PANORAMA[];
++#endif
+ #endif
+     // The dimensions for captured pictures in pixels (width x height).
+     // Example value: "1024x768". Read/write.
+@@ -889,6 +903,22 @@ public:
+     static const char LIGHTFX_HDR[];
+ 
+ #ifdef QCOM_HARDWARE
++#ifdef QCOM_LEGACY_CAM_PARAMS
++    static const char FOCUS_MODE_CONTINUOUS_CAMERA[];
++
++    // Values for Continuous AF
++    static const char CAF_OFF[] ;
++    static const char CAF_ON[] ;
++    // Proprietaries from CodeAurora use these...
++    static const char CONTINUOUS_AF_OFF[] ;
++    static const char CONTINUOUS_AF_ON[] ;
++    static const char KEY_CONTINUOUS_AF[] ;
++    static const char KEY_CAF[] ;
++    static const char KEY_TAKING_PICTURE_ZOOM[];
++    static const char KEY_PANORAMA_MODE[];
++    static const char PANORAMA_MODE_NOT_INPROGRESS[];
++    static const char PANORAMA_MODE_INPROGRESS[];
++#endif
+     // Normal focus mode. Applications should call
+     // CameraHardwareInterface.autoFocus to start the focus in this mode.
+     static const char FOCUS_MODE_NORMAL[];
+@@ -912,10 +942,19 @@ public:
+ 
+     static const char KEY_SHARPNESS[];
+     static const char KEY_MAX_SHARPNESS[];
++#ifdef QCOM_LEGACY_CAM_PARAMS
++    static const char KEY_MIN_SHARPNESS[];
++#endif
+     static const char KEY_CONTRAST[];
+     static const char KEY_MAX_CONTRAST[];
++#ifdef QCOM_LEGACY_CAM_PARAMS
++    static const char KEY_MIN_CONTRAST[];
++#endif
+     static const char KEY_SATURATION[];
+     static const char KEY_MAX_SATURATION[];
++#ifdef QCOM_LEGACY_CAM_PARAMS
++    static const char KEY_MIN_SATURATION[];
++#endif
+ 
+     static const char KEY_HISTOGRAM[] ;
+     static const char KEY_SUPPORTED_HISTOGRAM_MODES[] ;
+@@ -1008,6 +1047,9 @@ public:
+     int getOrientation() const;
+     void setOrientation(int orientation);
+     void setPreviewFpsRange(int minFPS,int maxFPS);
++#ifdef QCOM_LEGACY_CAM_PARAMS
++    void setPostviewSize(int x, int y);
++#endif
+     void getSupportedHfrSizes(Vector<Size> &sizes) const;
+ #endif
+ 
+diff --git a/services/camera/libcameraservice/Android.mk b/services/camera/libcameraservice/Android.mk
+index 83d9ccd..40d8eec 100644
+--- a/services/camera/libcameraservice/Android.mk
++++ b/services/camera/libcameraservice/Android.mk
+@@ -54,6 +54,14 @@ LOCAL_C_INCLUDES += \
+ 
+ LOCAL_CFLAGS += -Wall -Wextra
+ 
++ifeq ($(BOARD_USES_QCOM_LEGACY_CAM_PARAMS),true)
++    LOCAL_CFLAGS += -DQCOM_LEGACY_CAM_PARAMS
++endif
++
++ifeq ($(BOARD_HAVE_HTC_FFC),true)
++    LOCAL_CFLAGS += -DBOARD_HAVE_HTC_FFC
++endif
++
+ LOCAL_MODULE:= libcameraservice
+ 
+ include $(BUILD_SHARED_LIBRARY)
+diff --git a/services/camera/libcameraservice/CameraClient.cpp b/services/camera/libcameraservice/CameraClient.cpp
+index 1feda71..502a6a8 100644
+--- a/services/camera/libcameraservice/CameraClient.cpp
++++ b/services/camera/libcameraservice/CameraClient.cpp
+@@ -257,8 +257,10 @@ void CameraClient::disconnect() {
+     // Release the held ANativeWindow resources.
+     if (mPreviewWindow != 0) {
+ #ifdef QCOM_HARDWARE
++#ifndef NO_UPDATE_PREVIEW
+         mHardware->setPreviewWindow(0);
+ #endif
++#endif
+         disconnectWindow(mPreviewWindow);
+         mPreviewWindow = 0;
+ #ifndef QCOM_HARDWARE
+@@ -303,9 +305,14 @@ status_t CameraClient::setPreviewWindow(const sp<IBinder>& binder,
+             result = mHardware->setPreviewWindow(window);
+         }
+ #ifdef QCOM_HARDWARE
++#ifndef NO_UPDATE_PREVIEW
+     } else {
++        if (window != 0) {
++            native_window_set_buffers_transform(window.get(), mOrientation);
++        }
+         result = mHardware->setPreviewWindow(window);
+ #endif
++#endif
+     }
+ 
+     if (result == NO_ERROR) {
+diff --git a/services/camera/libcameraservice/CameraService.cpp b/services/camera/libcameraservice/CameraService.cpp
+index 0460df3..955f0ba 100644
+--- a/services/camera/libcameraservice/CameraService.cpp
++++ b/services/camera/libcameraservice/CameraService.cpp
+@@ -21,6 +21,8 @@
+ #include <stdio.h>
+ #include <sys/types.h>
+ #include <pthread.h>
++#include <unistd.h>
++#include <fcntl.h>
+ 
+ #include <binder/AppOpsManager.h>
+ #include <binder/IPCThreadState.h>
+@@ -83,6 +85,24 @@ static void camera_device_status_change(
+ 
+ // ----------------------------------------------------------------------------
+ 
++#if defined(BOARD_HAVE_HTC_FFC)
++#define HTC_SWITCH_CAMERA_FILE_PATH "/sys/android_camera2/htcwc"
++static void htcCameraSwitch(int cameraId)
++{
++    char buffer[16];
++    int fd;
++
++    if (access(HTC_SWITCH_CAMERA_FILE_PATH, W_OK) == 0) {
++        snprintf(buffer, sizeof(buffer), "%d", cameraId);
++
++        fd = open(HTC_SWITCH_CAMERA_FILE_PATH, O_WRONLY);
++        write(fd, buffer, strlen(buffer));
++        close(fd);
++    }
++}
++#endif
++
++
+ // This is ugly and only safe if we never re-create the CameraService, but
+ // should be ok for now.
+ static CameraService *gCameraService;
+@@ -318,6 +338,10 @@ bool CameraService::canConnectUnsafe(int cameraId,
+     String8 clientName8(clientPackageName);
+     int callingPid = getCallingPid();
+ 
++#if defined(BOARD_HAVE_HTC_FFC)
++    htcCameraSwitch(cameraId);
++#endif
++
+     if (mClient[cameraId] != 0) {
+         client = mClient[cameraId].promote();
+         if (client != 0) {
+-- 
+1.8.1.2
