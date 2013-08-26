@@ -1,0 +1,27 @@
+From 0ec39d0c655530e30adc50dccb3ff84edf008699 Mon Sep 17 00:00:00 2001
+From: Evan McClain <aeroevan@gmail.com>
+Date: Thu, 15 Nov 2012 22:30:24 -0500
+Subject: [PATCH] Build with -fno-strict-aliasing
+
+Change-Id: Iaf69aee7081ff2288c2d7df5c2983d8ac0ab4598
+Signed-off-by: Evan McClain <aeroevan@gmail.com>
+---
+ Android.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Android.mk b/Android.mk
+index 04ed5f0..1967ce8 100644
+--- a/Android.mk
++++ b/Android.mk
+@@ -75,7 +75,7 @@ common_SRC_FILES:= \
+ 	missing.c \
+ 	android.c android.h
+ 
+-common_CFLAGS += -DANDROID_CHANGES
++common_CFLAGS += -DANDROID_CHANGES -fno-strict-aliasing
+ 
+ common_C_INCLUDES += \
+ 	external/openssl \
+-- 
+1.8.1.6
+

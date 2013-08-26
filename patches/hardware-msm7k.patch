@@ -1,0 +1,25 @@
+From f5bab7e4208ccb06ea3fa288c9c9fc926226fbd9 Mon Sep 17 00:00:00 2001
+From: David Eddlemon <DavidEddlemon@Gmail.com>
+Date: Thu, 30 May 2013 14:37:49 -0500
+Subject: [PATCH] Added fno strict aliasing for linaro fix
+
+---
+ librpc/Android.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/librpc/Android.mk b/librpc/Android.mk
+index fc45e94..cf1f3bf 100644
+--- a/librpc/Android.mk
++++ b/librpc/Android.mk
+@@ -6,7 +6,7 @@ LOCAL_SRC_FILES:= xdr.c rpc.c svc.c clnt.c ops.c svc_clnt_common.c
+ 
+ LOCAL_C_INCLUDES:=$(LOCAL_PATH)
+ 
+-LOCAL_CFLAGS:= -fno-short-enums 
++LOCAL_CFLAGS:= -fno-short-enums -fno-strict-aliasing
+ 
+ LOCAL_CFLAGS+=-DRPC_OFFSET=0
+ #LOCAL_CFLAGS+=-DDEBUG -DVERBOSE
+-- 
+1.8.1.6
+

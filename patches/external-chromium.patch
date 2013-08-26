@@ -1,0 +1,234 @@
+From 99550ef60b74a31a4b51c2805158b39354eab410 Mon Sep 17 00:00:00 2001
+From: Bernhard Rosenkraenzer <Bernhard.Rosenkranzer@linaro.org>
+Date: Tue, 13 Dec 2011 13:48:20 +0059
+Subject: [PATCH] chromium: Fix aliasing violations
+
+Signed-off-by: Bernhard Rosenkraenzer <Bernhard.Rosenkranzer@linaro.org>
+---
+ base/dir_reader_linux.h                           | 13 ++++++++++---
+ base/md5.cc                                       | 17 ++++++++++-------
+ net/base/ip_endpoint.cc                           | 10 ++++++----
+ net/base/network_change_notifier_netlink_linux.cc |  7 +++++--
+ net/socket/tcp_client_socket_libevent.cc          | 19 ++++++++++++-------
+ net/spdy/spdy_framer.cc                           | 16 ++++++++++------
+ 6 files changed, 53 insertions(+), 29 deletions(-)
+
+diff --git a/base/dir_reader_linux.h b/base/dir_reader_linux.h
+index 2b83334..b50e17c 100644
+--- a/base/dir_reader_linux.h
++++ b/base/dir_reader_linux.h
+@@ -49,7 +49,11 @@ class DirReaderLinux {
+   // Move to the next entry returning false if the iteration is complete.
+   bool Next() {
+     if (size_) {
+-      linux_dirent* dirent = reinterpret_cast<linux_dirent*>(&buf_[offset_]);
++      union {
++        const unsigned char *bufp;
++        const linux_dirent* dirent;
++      };
++      bufp = &buf_[offset_];
+       offset_ += dirent->d_reclen;
+     }
+ 
+@@ -72,8 +76,11 @@ class DirReaderLinux {
+     if (!size_)
+       return NULL;
+ 
+-    const linux_dirent* dirent =
+-        reinterpret_cast<const linux_dirent*>(&buf_[offset_]);
++    union {
++      const unsigned char *bufp;
++      const linux_dirent* dirent;
++    };
++    bufp = &buf_[offset_];
+     return dirent->d_name;
+   }
+ 
+diff --git a/base/md5.cc b/base/md5.cc
+index f85cf43..ef7d0df 100644
+--- a/base/md5.cc
++++ b/base/md5.cc
+@@ -27,7 +27,10 @@
+ struct Context {
+   uint32 buf[4];
+   uint32 bits[2];
+-  unsigned char in[64];
++  union {
++    unsigned char in[64];
++    uint32_t in32[64/4];
++  };
+ };
+ 
+ /*
+@@ -185,7 +188,7 @@ void MD5Update(MD5Context *pCtx, const void *inbuf, size_t len){
+                 }
+                 memcpy(p, buf, t);
+                 byteReverse(ctx->in, 16);
+-                MD5Transform(ctx->buf, (uint32 *)ctx->in);
++                MD5Transform(ctx->buf, ctx->in32);
+                 buf += t;
+                 len -= t;
+         }
+@@ -195,7 +198,7 @@ void MD5Update(MD5Context *pCtx, const void *inbuf, size_t len){
+         while (len >= 64) {
+                 memcpy(ctx->in, buf, 64);
+                 byteReverse(ctx->in, 16);
+-                MD5Transform(ctx->buf, (uint32 *)ctx->in);
++                MD5Transform(ctx->buf, ctx->in32);
+                 buf += 64;
+                 len -= 64;
+         }
+@@ -230,7 +233,7 @@ void MD5Final(MD5Digest* digest, MD5Context *pCtx){
+                 /* Two lots of padding:  Pad the first block to 64 bytes */
+                 memset(p, 0, count);
+                 byteReverse(ctx->in, 16);
+-                MD5Transform(ctx->buf, (uint32 *)ctx->in);
++                MD5Transform(ctx->buf, ctx->in32);
+ 
+                 /* Now fill the next block with 56 bytes */
+                 memset(ctx->in, 0, 56);
+@@ -241,10 +244,10 @@ void MD5Final(MD5Digest* digest, MD5Context *pCtx){
+         byteReverse(ctx->in, 14);
+ 
+         /* Append length in bits and transform */
+-        ((uint32 *)ctx->in)[ 14 ] = ctx->bits[0];
+-        ((uint32 *)ctx->in)[ 15 ] = ctx->bits[1];
++        ctx->in32[ 14 ] = ctx->bits[0];
++        ctx->in32[ 15 ] = ctx->bits[1];
+ 
+-        MD5Transform(ctx->buf, (uint32 *)ctx->in);
++        MD5Transform(ctx->buf, ctx->in32);
+         byteReverse((unsigned char *)ctx->buf, 4);
+         memcpy(digest->a, ctx->buf, 16);
+         memset(ctx, 0, sizeof(ctx));    /* In case it's sensitive */
+diff --git a/net/base/ip_endpoint.cc b/net/base/ip_endpoint.cc
+index 55ea446..b940710 100644
+--- a/net/base/ip_endpoint.cc
++++ b/net/base/ip_endpoint.cc
+@@ -107,13 +107,15 @@ bool IPEndPoint::FromSockAddr(const struct sockaddr* address,
+ }
+ 
+ std::string IPEndPoint::ToString() const {
+-  struct sockaddr_storage addr_storage;
++  union {
++    struct sockaddr_storage addr_storage;
++    struct sockaddr addr;
++  };
+   size_t addr_len = sizeof(addr_storage);
+-  struct sockaddr* addr = reinterpret_cast<struct sockaddr*>(&addr_storage);
+-  if (!ToSockAddr(addr, &addr_len)) {
++  if (!ToSockAddr(&addr, &addr_len)) {
+     return "";
+   }
+-  return NetAddressToStringWithPort(addr, addr_len);
++  return NetAddressToStringWithPort(&addr, addr_len);
+ }
+ 
+ bool IPEndPoint::operator<(const IPEndPoint& that) const {
+diff --git a/net/base/network_change_notifier_netlink_linux.cc b/net/base/network_change_notifier_netlink_linux.cc
+index 493e17a..439943e 100644
+--- a/net/base/network_change_notifier_netlink_linux.cc
++++ b/net/base/network_change_notifier_netlink_linux.cc
+@@ -71,13 +71,16 @@ int InitializeNetlinkSocket() {
+     return -1;
+   }
+ 
+-  struct sockaddr_nl local_addr;
++  union {
++    struct sockaddr_nl local_addr;
++    struct sockaddr local_addr_generic;
++  };
+   memset(&local_addr, 0, sizeof(local_addr));
+   local_addr.nl_family = AF_NETLINK;
+   local_addr.nl_pid = getpid();
+   local_addr.nl_groups = RTMGRP_IPV4_IFADDR | RTMGRP_IPV6_IFADDR |
+                          RTMGRP_NOTIFY;
+-  int ret = bind(sock, reinterpret_cast<struct sockaddr*>(&local_addr),
++  int ret = bind(sock, &local_addr_generic,
+                  sizeof(local_addr));
+   if (ret < 0) {
+     PLOG(ERROR) << "Error binding netlink socket";
+diff --git a/net/socket/tcp_client_socket_libevent.cc b/net/socket/tcp_client_socket_libevent.cc
+index f820955..3e8257b 100644
+--- a/net/socket/tcp_client_socket_libevent.cc
++++ b/net/socket/tcp_client_socket_libevent.cc
+@@ -552,10 +552,13 @@ void TCPClientSocketLibevent::LogConnectCompletion(int net_error) {
+     return;
+   }
+ 
+-  struct sockaddr_storage source_address;
++  union {
++    struct sockaddr_storage source_address;
++    struct sockaddr source_address_generic;
++  };
+   socklen_t addrlen = sizeof(source_address);
+   int rv = getsockname(
+-      socket_, reinterpret_cast<struct sockaddr*>(&source_address), &addrlen);
++      socket_, &source_address_generic, &addrlen);
+   if (rv != 0) {
+     PLOG(ERROR) << "getsockname() [rv: " << rv << "] error: ";
+     NOTREACHED();
+@@ -565,7 +568,7 @@ void TCPClientSocketLibevent::LogConnectCompletion(int net_error) {
+ 
+   const std::string source_address_str =
+       NetAddressToStringWithPort(
+-          reinterpret_cast<const struct sockaddr*>(&source_address),
++          &source_address_generic,
+           sizeof(source_address));
+   net_log_.EndEvent(NetLog::TYPE_TCP_CONNECT,
+                     make_scoped_refptr(new NetLogStringParameter(
+@@ -684,12 +687,14 @@ int TCPClientSocketLibevent::GetLocalAddress(IPEndPoint* address) const {
+   if (!IsConnected())
+     return ERR_SOCKET_NOT_CONNECTED;
+ 
+-  struct sockaddr_storage addr_storage;
++  union {
++    struct sockaddr_storage addr_storage;
++    struct sockaddr addr;
++  };
+   socklen_t addr_len = sizeof(addr_storage);
+-  struct sockaddr* addr = reinterpret_cast<struct sockaddr*>(&addr_storage);
+-  if (getsockname(socket_, addr, &addr_len))
++  if (getsockname(socket_, &addr, &addr_len))
+     return MapSystemError(errno);
+-  if (!address->FromSockAddr(addr, addr_len))
++  if (!address->FromSockAddr(&addr, addr_len))
+     return ERR_FAILED;
+ 
+   return OK;
+diff --git a/net/spdy/spdy_framer.cc b/net/spdy/spdy_framer.cc
+index 5f645fc..6c18ab3 100644
+--- a/net/spdy/spdy_framer.cc
++++ b/net/spdy/spdy_framer.cc
+@@ -1037,18 +1037,22 @@ size_t SpdyFramer::ProcessControlFramePayload(const char* data, size_t len) {
+       if (remaining_control_payload_)
+         break;
+     }
+-    SpdyControlFrame control_frame(current_frame_buffer_, false);
+-    visitor_->OnControl(&control_frame);
++    union {
++      SpdyControlFrame *control_frame;
++      SpdySynReplyControlFrame *control_frame_synreply;
++    };
++    control_frame=new SpdyControlFrame(current_frame_buffer_, false);
++    visitor_->OnControl(control_frame);
+ 
+     // If this is a FIN, tell the caller.
+-    if (control_frame.type() == SYN_REPLY &&
+-        control_frame.flags() & CONTROL_FLAG_FIN) {
+-      visitor_->OnStreamFrameData(reinterpret_cast<SpdySynReplyControlFrame*>(
+-                                      &control_frame)->stream_id(),
++    if (control_frame->type() == SYN_REPLY &&
++        control_frame->flags() & CONTROL_FLAG_FIN) {
++      visitor_->OnStreamFrameData(control_frame_synreply->stream_id(),
+                                   NULL, 0);
+     }
+ 
+     CHANGE_STATE(SPDY_IGNORE_REMAINING_PAYLOAD);
++    delete control_frame;
+   } while (false);
+   return original_len - len;
+ }
+-- 
+1.8.1.6
+

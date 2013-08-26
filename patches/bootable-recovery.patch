@@ -1,0 +1,25 @@
+From 02c8c4b575002d6ad14c265d7ce53ebb01bdd494 Mon Sep 17 00:00:00 2001
+From: Sultanxda <sultanxda@gmail.com>
+Date: Sat, 24 Aug 2013 19:50:01 -0700
+Subject: [PATCH] Remove -Werror flag
+
+---
+ voldclient/Android.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/voldclient/Android.mk b/voldclient/Android.mk
+index b76d7be..26407b8 100644
+--- a/voldclient/Android.mk
++++ b/voldclient/Android.mk
+@@ -3,7 +3,7 @@ LOCAL_PATH := $(call my-dir)
+ include $(CLEAR_VARS)
+ LOCAL_MODULE := libvoldclient
+ LOCAL_SRC_FILES := commands.c dispatcher.c event_loop.c
+-LOCAL_CFLAGS := -DMINIVOLD -Werror
++LOCAL_CFLAGS := -DMINIVOLD
+ LOCAL_C_INCLUDES :=         	\
+     bootable/recovery       	\
+     system/core/fs_mgr/include	\
+-- 
+1.8.1.6
+

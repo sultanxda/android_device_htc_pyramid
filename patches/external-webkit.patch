@@ -1,0 +1,27 @@
+From 4a2b439da9647220315153100e86ede6aedd2be9 Mon Sep 17 00:00:00 2001
+From: Evan McClain <aeroevan@gmail.com>
+Date: Thu, 15 Nov 2012 22:28:33 -0500
+Subject: [PATCH] libangle: build with -fno-strict-aliasing
+
+Change-Id: Ic2e3f54799c07868ca44b2b0e900660cc4982970
+Signed-off-by: Evan McClain <aeroevan@gmail.com>
+---
+ Android.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Android.mk b/Android.mk
+index a781f91..5fba716 100644
+--- a/Android.mk
++++ b/Android.mk
+@@ -444,7 +444,7 @@ LOCAL_SRC_FILES := $(addprefix Source/ThirdParty/ANGLE/src/compiler/,$(LOCAL_SRC
+ LOCAL_C_INCLUDES := $(WEBKIT_C_INCLUDES) \
+ 	$(ANGLE_PATH)/include \
+ 	$(ANGLE_PATH)/src
+-LOCAL_CFLAGS += -Wno-error=non-virtual-dtor
++LOCAL_CFLAGS += -Wno-error=non-virtual-dtor -fno-strict-aliasing
+ # Build libangle
+ include $(BUILD_STATIC_LIBRARY)
+ 
+-- 
+1.8.1.6
+

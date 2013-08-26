@@ -1,0 +1,171 @@
+From d68afc4db958aef77a486bd9e0022e18458134a0 Mon Sep 17 00:00:00 2001
+From: Sultanxda <sultanxda@gmail.com>
+Date: Sat, 24 Aug 2013 23:40:34 -0700
+Subject: [PATCH] Squashed commit of the following:
+
+commit e195dbc7ccb8ea4d08a73108f25ec8daff3d9337
+Author: Sultanxda <sultanxda@gmail.com>
+Date:   Sat Aug 24 23:39:09 2013 -0700
+
+    Use default CM flags
+
+commit 2df122cb6351d8b4562fe6e5e291efee921db1c8
+Author: Sultanxda <sultanxda@gmail.com>
+Date:   Sat Aug 24 19:37:31 2013 -0700
+
+    Squashed commit of the following:
+
+    commit 011610a9c79ee43c4b7ff4dc06e02f8fdb716ed2
+    Author: Sultanxda <sultanxda@gmail.com>
+    Date:   Sat Aug 24 19:36:24 2013 -0700
+
+        Use flags from IAmTheOneTheyCallNeo
+
+    commit db8ddb6a5f32cd75dc908dd276e071d8ac403ebc
+    Author: Sultanxda <sultanxda@gmail.com>
+    Date:   Sat Aug 24 18:23:35 2013 -0700
+
+        Support building ROM + kernel with Linaro
+
+        Signed-off-by: Sultanxda <sultanxda@gmail.com>
+---
+ core/combo/TARGET_linux-arm.mk | 7 ++++---
+ core/dumpvar.mk                | 8 ++------
+ core/linaro_compilerchecks.mk  | 2 +-
+ core/tasks/kernel.mk           | 6 +++---
+ envsetup.sh                    | 4 ++--
+ tools/adbs                     | 6 ++----
+ 6 files changed, 14 insertions(+), 19 deletions(-)
+
+diff --git a/core/combo/TARGET_linux-arm.mk b/core/combo/TARGET_linux-arm.mk
+index 96f8e83..61bc57d 100644
+--- a/core/combo/TARGET_linux-arm.mk
++++ b/core/combo/TARGET_linux-arm.mk
+@@ -49,7 +49,7 @@ include $(TARGET_ARCH_SPECIFIC_MAKEFILE)
+ 
+ # You can set TARGET_TOOLS_PREFIX to get gcc from somewhere else
+ ifeq ($(strip $(TARGET_TOOLS_PREFIX)),)
+-TARGET_TOOLCHAIN_ROOT := prebuilts/gcc/$(HOST_PREBUILT_TAG)/arm/arm-linux-androideabi-$(TARGET_GCC_VERSION)
++TARGET_TOOLCHAIN_ROOT := /home/sultan/Downloads/android-toolchain-eabi
+ TARGET_TOOLS_PREFIX := $(TARGET_TOOLCHAIN_ROOT)/bin/arm-linux-androideabi-
+ endif
+ 
+@@ -121,7 +121,7 @@ TARGET_GLOBAL_CFLAGS += $(TARGET_ANDROID_CONFIG_CFLAGS)
+ # We cannot turn it off blindly since the option is not available
+ # in gcc-4.4.x.  We also want to disable sincos optimization globally
+ # by turning off the builtin sin function.
+-ifneq ($(filter 4.6 4.6.% 4.7 4.7.%, $(TARGET_GCC_VERSION)),)
++ifneq ($(filter 4.6 4.6.% 4.7 4.7.% 4.8 4.8.% 4.9 4.9.%, $(TARGET_GCC_VERSION)),)
+ TARGET_GLOBAL_CFLAGS += -Wno-unused-but-set-variable -fno-builtin-sin \
+ 			-fno-strict-volatile-bitfields
+ endif
+@@ -153,7 +153,8 @@ TARGET_GLOBAL_CPPFLAGS += -fvisibility-inlines-hidden
+ TARGET_RELEASE_CFLAGS := \
+ 			-DNDEBUG \
+ 			-g \
+-			-Wstrict-aliasing=2 \
++			-Wstrict-aliasing=3 \
++			-Werror=strict-aliasing \
+ 			-fgcse-after-reload \
+ 			-frerun-cse-after-loop \
+ 			-frename-registers
+diff --git a/core/dumpvar.mk b/core/dumpvar.mk
+index 716f281..e126ab5 100644
+--- a/core/dumpvar.mk
++++ b/core/dumpvar.mk
+@@ -11,13 +11,9 @@ endif
+ 
+ # Add the ARM toolchain bin dir if it actually exists
+ ifeq ($(TARGET_ARCH),arm)
+-    ifneq ($(wildcard $(PWD)/prebuilts/gcc/$(HOST_PREBUILT_TAG)/arm/arm-linux-androideabi-$(TARGET_GCC_VERSION)/bin),)
++    ifneq ($(wildcard /home/sultan/Downloads/android-toolchain-eabi/bin),)
+         # this should be copied to HOST_OUT_EXECUTABLES instead
+-        ABP:=$(ABP):$(PWD)/prebuilts/gcc/$(HOST_PREBUILT_TAG)/arm/arm-linux-androideabi-$(TARGET_GCC_VERSION)/bin
+-    endif
+-    ifneq ($(wildcard $(PWD)/prebuilts/gcc/$(HOST_PREBUILT_TAG)/arm/arm-eabi-$(TARGET_GCC_VERSION)/bin),)
+-        # this should be copied to HOST_OUT_EXECUTABLES instead
+-        ABP:=$(ABP):$(PWD)/prebuilts/gcc/$(HOST_PREBUILT_TAG)/arm/arm-eabi-$(TARGET_GCC_VERSION)/bin
++        ABP:=$(ABP):/home/sultan/Downloads/android-toolchain-eabi/bin
+     endif
+ else ifeq ($(TARGET_ARCH),x86)
+ 
+diff --git a/core/linaro_compilerchecks.mk b/core/linaro_compilerchecks.mk
+index d172703..956c19f 100644
+--- a/core/linaro_compilerchecks.mk
++++ b/core/linaro_compilerchecks.mk
+@@ -22,7 +22,7 @@
+ # friends in the same file that sets TARGET_CC...
+ 
+ ifeq ($(strip $(TARGET_TOOLS_PREFIX)),)
+-LINARO_COMPILERCHECK_CC := prebuilts/gcc/$(HOST_PREBUILT_TAG)/arm/arm-linux-androideabi-4.6/bin/arm-linux-androideabi-gcc$(HOST_EXECUTABLE_SUFFIX)
++LINARO_COMPILERCHECK_CC := /home/sultan/Downloads/android-toolchain-eabi/bin/arm-linux-androideabi-gcc$(HOST_EXECUTABLE_SUFFIX)
+ else
+ LINARO_COMPILERCHECK_CC := $(TARGET_TOOLS_PREFIX)gcc$(HOST_EXECUTABLE_SUFFIX)
+ endif
+diff --git a/core/tasks/kernel.mk b/core/tasks/kernel.mk
+index dc51e7c..e670261 100644
+--- a/core/tasks/kernel.mk
++++ b/core/tasks/kernel.mk
+@@ -136,12 +136,12 @@ ifeq ($(TARGET_ARCH),arm)
+     endif
+     ifneq ($(TARGET_KERNEL_CUSTOM_TOOLCHAIN),)
+         ifeq ($(HOST_OS),darwin)
+-            ARM_CROSS_COMPILE:=CROSS_COMPILE="$(ccache) $(ANDROID_BUILD_TOP)/prebuilt/darwin-x86/toolchain/$(TARGET_KERNEL_CUSTOM_TOOLCHAIN)/bin/arm-eabi-"
++            ARM_CROSS_COMPILE:=CROSS_COMPILE=/home/sultan/Downloads/arm-cortex_a8-linux-gnueabi-linaro_4.7.4-2013.08/bin/arm-cortex_a8-linux-gnueabi-
+         else
+-            ARM_CROSS_COMPILE:=CROSS_COMPILE="$(ccache) $(ANDROID_BUILD_TOP)/prebuilt/linux-x86/toolchain/$(TARGET_KERNEL_CUSTOM_TOOLCHAIN)/bin/arm-eabi-"
++            ARM_CROSS_COMPILE:=CROSS_COMPILE=/home/sultan/Downloads/arm-cortex_a8-linux-gnueabi-linaro_4.7.4-2013.08/bin/arm-cortex_a8-linux-gnueabi-
+         endif
+     else
+-        ARM_CROSS_COMPILE:=CROSS_COMPILE="$(ccache) $(ARM_EABI_TOOLCHAIN)/arm-eabi-"
++        ARM_CROSS_COMPILE:=CROSS_COMPILE=/home/sultan/Downloads/arm-cortex_a8-linux-gnueabi-linaro_4.7.4-2013.08/bin/arm-cortex_a8-linux-gnueabi-
+     endif
+     ccache = 
+ endif
+diff --git a/envsetup.sh b/envsetup.sh
+index 29ad0af..3dd7ddd 100644
+--- a/envsetup.sh
++++ b/envsetup.sh
+@@ -150,7 +150,7 @@ function setpaths()
+     case $ARCH in
+         x86) toolchaindir=x86/i686-linux-android-$targetgccversion/bin
+             ;;
+-        arm) toolchaindir=arm/arm-linux-androideabi-$targetgccversion/bin
++        arm) toolchaindir=/home/sultan/Downloads/android-toolchain-eabi/bin
+             ;;
+         mips) toolchaindir=mips/mipsel-linux-android-$targetgccversion/bin
+             ;;
+@@ -166,7 +166,7 @@ function setpaths()
+     unset ARM_EABI_TOOLCHAIN ARM_EABI_TOOLCHAIN_PATH
+     case $ARCH in
+         arm)
+-            toolchaindir=arm/arm-eabi-$targetgccversion/bin
++            toolchaindir=/home/sultan/Downloads/android-toolchain-eabi/bin
+             if [ -d "$gccprebuiltdir/$toolchaindir" ]; then
+                  export ARM_EABI_TOOLCHAIN="$gccprebuiltdir/$toolchaindir"
+                  ARM_EABI_TOOLCHAIN_PATH=":$gccprebuiltdir/$toolchaindir"
+diff --git a/tools/adbs b/tools/adbs
+index 37c520c..8af6496 100755
+--- a/tools/adbs
++++ b/tools/adbs
+@@ -140,15 +140,13 @@ def SetupToolsPath():
+     uname = "darwin-x86"
+   elif uname == "Linux":
+     uname = "linux-x86"
+-  gcc_version = os.environ["TARGET_GCC_VERSION"]
+-  prefix = "./prebuilts/gcc/" + uname + "/arm/arm-linux-androideabi-" + \
+-           gcc_version + "/bin/"
++  prefix = "./prebuilts/gcc/" + uname + "/home/sultan/Downloads/android-toolchain-eabi/bin/"
+   addr2line_cmd = prefix + "arm-linux-androideabi-addr2line"
+ 
+   if (not os.path.exists(addr2line_cmd)):
+     try:
+       prefix = os.environ['ANDROID_BUILD_TOP'] + "/prebuilts/gcc/" + \
+-               uname + "/arm/arm-linux-androideabi-" + gcc_version + "/bin/"
++               uname + "/home/sultan/Downloads/android-toolchain-eabi/bin/"
+     except:
+       prefix = "";
+ 
+-- 
+1.8.4
+

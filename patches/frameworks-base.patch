@@ -1,0 +1,122 @@
+From 55cb1ead131fcb88f10571c482e3e3e818ca2f10 Mon Sep 17 00:00:00 2001
+From: Bernhard Rosenkraenzer <Bernhard.Rosenkranzer@linaro.org>
+Date: Mon, 20 Aug 2012 16:55:58 +0200
+Subject: [PATCH] frameworks/base: Fix aliasing violations
+
+Fix violations of strict aliasing rules
+
+Change-Id: Ia83db6a0be18f52e8f274c581c3b42f031b39247
+Signed-off-by: Bernhard Rosenkraenzer <Bernhard.Rosenkranzer@linaro.org>
+
+frameworks/base: Fix various aliasing violations
+
+Signed-off-by: Bernhard Rosenkraenzer <Bernhard.Rosenkranzer@linaro.org>
+
+frameworks/base: Fix compile errors
+
+Fix ISO C++11 incompatibility in TextLayoutCache and
+aliasing violation in FontRenderer
+
+Change-Id: I19a9560737005e72f706c12c0ccfdcd0c7765b06
+Signed-off-by: Bernhard Rosenkraenzer <Bernhard.Rosenkranzer@linaro.org>
+
+Conflicts:
+
+	libs/hwui/FontRenderer.cpp
+	libs/hwui/ShapeCache.h
+	libs/hwui/TextDropShadowCache.h
+	voip/jni/rtp/AudioGroup.cpp
+---
+ core/jni/Android.mk                           |  1 +
+ core/jni/android/graphics/TextLayoutCache.cpp | 10 +++++-----
+ libs/androidfw/ResourceTypes.cpp              |  6 ++++--
+ 3 files changed, 10 insertions(+), 7 deletions(-)
+
+diff --git a/core/jni/Android.mk b/core/jni/Android.mk
+index b07b3c8..4c7058e 100644
+--- a/core/jni/Android.mk
++++ b/core/jni/Android.mk
+@@ -4,6 +4,7 @@ include $(CLEAR_VARS)
+ LOCAL_CFLAGS += -DHAVE_CONFIG_H -DKHTML_NO_EXCEPTIONS -DGKWQ_NO_JAVA
+ LOCAL_CFLAGS += -DNO_SUPPORT_JS_BINDING -DQT_NO_WHEELEVENT -DKHTML_NO_XBL
+ LOCAL_CFLAGS += -U__APPLE__
++LOCAL_CFLAGS += -fno-strict-aliasing
+ 
+ ifeq ($(TARGET_ARCH), arm)
+ 	LOCAL_CFLAGS += -DPACKED="__attribute__ ((packed))"
+diff --git a/core/jni/android/graphics/TextLayoutCache.cpp b/core/jni/android/graphics/TextLayoutCache.cpp
+index b2cf9c1..ef3f18e 100644
+--- a/core/jni/android/graphics/TextLayoutCache.cpp
++++ b/core/jni/android/graphics/TextLayoutCache.cpp
+@@ -143,7 +143,7 @@ void TextLayoutCache::purgeCaches() {
+                     "This indicates that the cache already has an entry with the "
+                     "same key but it should not since we checked earlier!"
+                     " - start = %d, count = %d, contextCount = %d - Text = '%s'",
+-                    start, count, contextCount, String8(key.getText() + start, count).string());
++                    start, count, contextCount, String8(reinterpret_cast<const char16_t*>(key.getText() + start), count).string());
+ 
+             if (mDebugEnabled) {
+                 nsecs_t totalTime = systemTime(SYSTEM_TIME_MONOTONIC) - startTime;
+@@ -154,7 +154,7 @@ void TextLayoutCache::purgeCaches() {
+                         value.get(), start, count, contextCount, size, mMaxSize - mSize,
+                         value->getElapsedTime() * 0.000001f,
+                         (totalTime - value->getElapsedTime()) * 0.000001f,
+-                        String8(key.getText() + start, count).string());
++                        String8(reinterpret_cast<const char16_t*>(key.getText() + start), count).string());
+             }
+         } else {
+             if (mDebugEnabled) {
+@@ -164,7 +164,7 @@ void TextLayoutCache::purgeCaches() {
+                         " - Compute time %0.6f ms - Text = '%s'",
+                         start, count, contextCount, size, mMaxSize - mSize,
+                         value->getElapsedTime() * 0.000001f,
+-                        String8(key.getText() + start, count).string());
++                        String8(reinterpret_cast<const char16_t*>(key.getText() + start), count).string());
+             }
+         }
+     } else {
+@@ -184,7 +184,7 @@ void TextLayoutCache::purgeCaches() {
+                         value->getElapsedTime() * 0.000001f,
+                         elapsedTimeThruCacheGet * 0.000001f,
+                         deltaPercent,
+-                        String8(key.getText() + start, count).string());
++                        String8(reinterpret_cast<const char16_t*>(key.getText() + start), count).string());
+             }
+             if (mCacheHitCount % DEFAULT_DUMP_STATS_CACHE_HIT_INTERVAL == 0) {
+                 dumpCacheStats();
+@@ -226,7 +226,7 @@ void TextLayoutCache::dumpCacheStats() {
+         size_t start, size_t count, size_t contextCount, int dirFlags) :
+             start(start), count(count), contextCount(contextCount),
+             dirFlags(dirFlags) {
+-    textCopy.setTo(text, contextCount);
++    textCopy.setTo(reinterpret_cast<const char16_t*>(text), contextCount);
+     typeface = paint->getTypeface();
+     textSize = paint->getTextSize();
+     textSkewX = paint->getTextSkewX();
+diff --git a/libs/androidfw/ResourceTypes.cpp b/libs/androidfw/ResourceTypes.cpp
+index 6b7af1e..6ad8395 100644
+--- a/libs/androidfw/ResourceTypes.cpp
++++ b/libs/androidfw/ResourceTypes.cpp
+@@ -4095,7 +4095,7 @@ bool ResTable::stringToFloat(const char16_t* s, size_t len, Res_value* outValue)
+     if (*end == 0) {
+         if (outValue) {
+             outValue->dataType = outValue->TYPE_FLOAT;
+-            *(float*)(&outValue->data) = f;
++            memcpy(&outValue->data, &f, sizeof(float)); // *(float*)(&outValue->data) = f;
+             return true;
+         }
+     }
+@@ -5535,7 +5535,9 @@ void ResTable::print_value(const Package* pkg, const Res_value& value) const
+             }
+         } 
+     } else if (value.dataType == Res_value::TYPE_FLOAT) {
+-        printf("(float) %g\n", *(const float*)&value.data);
++        float f;
++        memcpy(&f, &value.data, sizeof(float));
++        printf("(float) %g\n", f);
+     } else if (value.dataType == Res_value::TYPE_DIMENSION) {
+         printf("(dimension) ");
+         print_complex(value.data, false);
+-- 
+1.8.1.6
+

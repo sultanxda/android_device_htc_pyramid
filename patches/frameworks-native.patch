@@ -1,0 +1,226 @@
+From c1efb0ad9bc849b9bb956d75d6c2891ccb4ea04f Mon Sep 17 00:00:00 2001
+From: Bernhard Rosenkraenzer <Bernhard.Rosenkranzer@linaro.org>
+Date: Thu, 12 Jul 2012 00:33:35 +0159
+Subject: [PATCH] frameworks/base: Make sure Singleton instantiations are
+ exported
+
+This fixes using Singletons across shared library borders
+with gcc 4.7+
+
+Change-Id: I84b9cc99add4ace64c16e4fa8414a4fc7e4693c7
+Signed-off-by: Bernhard Rosenkraenzer <Bernhard.Rosenkranzer@linaro.org>
+
+frameworks/native: Fix build in ISO C++ 11 mode
+
+Fix constructs that are considered new string literals in C++ 11 mode
+
+Change-Id: Iadcad5f83c79e6726ca66ced5fc1e038b7587069
+Signed-off-by: Bernhard Rosenkraenzer <Bernhard.Rosenkranzer@linaro.org>
+
+frameworks/native: Fix build in ISO C++11 mode
+
+Change-Id: Icc19cde1bf9c72397ed8bda545e9056483d83e8d
+Signed-off-by: Bernhard Rosenkraenzer <Bernhard.Rosenkranzer@linaro.org>
+
+binder: Fix ABI incompatibility between older and newer compilers
+
+Parcel::writeString16's first parameter was a char16_t - defined to
+uint16_t somewhere else.
+
+With ISO C++11 compatible compilers, however, char16_t is a
+compiler-defined-type that is not necessarily unsigned.
+
+This causes the symbol to be different, breaking support for talking
+to binary blobs built with pre-ISO C++11-compilers, such as the
+Galaxy Nexus RIL.
+
+Change-Id: Ibaa57fbd7d9fc4a95649d3b45d28d29963a9548b
+Signed-off-by: Bernhard Rosenkraenzer <Bernhard.Rosenkranzer@linaro.org>
+
+frameworks/native: Fix build with ISO C++11 compilers
+
+Fix macro definitions so they can't be confused with C++11 string
+literals
+
+Change-Id: I2856933291d08eed789188ea9be036324384e67f
+Signed-off-by: Bernhard Rosenkraenzer <Bernhard.Rosenkranzer@linaro.org>
+
+surfaceflinger: Work around aliasing violations
+
+Change-Id: I22e758390c1312e60bb4adac2365be201ba6f161
+Signed-off-by: Bernhard Rosenkraenzer <Bernhard.Rosenkranzer@linaro.org>
+---
+ include/binder/Parcel.h            |  2 +-
+ include/utils/Singleton.h          |  6 +++---
+ include/utils/Unicode.h            |  2 ++
+ libs/binder/Parcel.cpp             |  4 ++--
+ libs/gui/BufferItemConsumer.cpp    | 10 +++++-----
+ libs/gui/BufferQueue.cpp           | 10 +++++-----
+ libs/gui/ConsumerBase.cpp          | 10 +++++-----
+ libs/gui/CpuConsumer.cpp           | 10 +++++-----
+ services/surfaceflinger/Android.mk |  3 +++
+ 9 files changed, 31 insertions(+), 26 deletions(-)
+
+diff --git a/include/binder/Parcel.h b/include/binder/Parcel.h
+index 3ff95d2..f4d89de 100644
+--- a/include/binder/Parcel.h
++++ b/include/binder/Parcel.h
+@@ -99,7 +99,7 @@ class Parcel
+     status_t            writeCString(const char* str);
+     status_t            writeString8(const String8& str);
+     status_t            writeString16(const String16& str);
+-    status_t            writeString16(const char16_t* str, size_t len);
++    status_t            writeString16(const uint16_t* str, size_t len);
+     status_t            writeStrongBinder(const sp<IBinder>& val);
+     status_t            writeWeakBinder(const wp<IBinder>& val);
+     status_t            write(const Flattenable& val);
+diff --git a/include/utils/Singleton.h b/include/utils/Singleton.h
+index c60680e..b88a879 100644
+--- a/include/utils/Singleton.h
++++ b/include/utils/Singleton.h
+@@ -65,9 +65,9 @@ class ANDROID_API Singleton
+  */
+ 
+ #define ANDROID_SINGLETON_STATIC_INSTANCE(TYPE)                 \
+-    template<> Mutex Singleton< TYPE >::sLock(Mutex::PRIVATE);  \
+-    template<> TYPE* Singleton< TYPE >::sInstance(0);           \
+-    template class Singleton< TYPE >;
++    template<> ANDROID_API Mutex Singleton< TYPE >::sLock(Mutex::PRIVATE);  \
++    template<> ANDROID_API TYPE* Singleton< TYPE >::sInstance(0);           \
++    template class ANDROID_API Singleton< TYPE >;
+ 
+ 
+ // ---------------------------------------------------------------------------
+diff --git a/include/utils/Unicode.h b/include/utils/Unicode.h
+index 9273533..443f66d 100644
+--- a/include/utils/Unicode.h
++++ b/include/utils/Unicode.h
+@@ -22,8 +22,10 @@
+ 
+ extern "C" {
+ 
++#if __cplusplus < 201103L && !defined(__GXX_EXPERIMENTAL_CXX0X__) && !defined(char16_t)
+ typedef uint32_t char32_t;
+ typedef uint16_t char16_t;
++#endif
+ 
+ // Standard string functions on char16_t strings.
+ int strcmp16(const char16_t *, const char16_t *);
+diff --git a/libs/binder/Parcel.cpp b/libs/binder/Parcel.cpp
+index c7bdcbc..3d7031e 100644
+--- a/libs/binder/Parcel.cpp
++++ b/libs/binder/Parcel.cpp
+@@ -672,10 +672,10 @@ status_t Parcel::writeString8(const String8& str)
+ 
+ status_t Parcel::writeString16(const String16& str)
+ {
+-    return writeString16(str.string(), str.size());
++    return writeString16((uint16_t*)str.string(), str.size());
+ }
+ 
+-status_t Parcel::writeString16(const char16_t* str, size_t len)
++status_t Parcel::writeString16(const uint16_t* str, size_t len)
+ {
+     if (str == NULL) return writeInt32(-1);
+     
+diff --git a/libs/gui/BufferItemConsumer.cpp b/libs/gui/BufferItemConsumer.cpp
+index 7db1b84..707267d 100644
+--- a/libs/gui/BufferItemConsumer.cpp
++++ b/libs/gui/BufferItemConsumer.cpp
+@@ -21,11 +21,11 @@
+ 
+ #include <gui/BufferItemConsumer.h>
+ 
+-#define BI_LOGV(x, ...) ALOGV("[%s] "x, mName.string(), ##__VA_ARGS__)
+-#define BI_LOGD(x, ...) ALOGD("[%s] "x, mName.string(), ##__VA_ARGS__)
+-#define BI_LOGI(x, ...) ALOGI("[%s] "x, mName.string(), ##__VA_ARGS__)
+-#define BI_LOGW(x, ...) ALOGW("[%s] "x, mName.string(), ##__VA_ARGS__)
+-#define BI_LOGE(x, ...) ALOGE("[%s] "x, mName.string(), ##__VA_ARGS__)
++#define BI_LOGV(x, ...) ALOGV("[%s] " x, mName.string(), ##__VA_ARGS__)
++#define BI_LOGD(x, ...) ALOGD("[%s] " x, mName.string(), ##__VA_ARGS__)
++#define BI_LOGI(x, ...) ALOGI("[%s] " x, mName.string(), ##__VA_ARGS__)
++#define BI_LOGW(x, ...) ALOGW("[%s] " x, mName.string(), ##__VA_ARGS__)
++#define BI_LOGE(x, ...) ALOGE("[%s] " x, mName.string(), ##__VA_ARGS__)
+ 
+ namespace android {
+ 
+diff --git a/libs/gui/BufferQueue.cpp b/libs/gui/BufferQueue.cpp
+index e2df0e3..82e626f 100644
+--- a/libs/gui/BufferQueue.cpp
++++ b/libs/gui/BufferQueue.cpp
+@@ -32,11 +32,11 @@
+ #include <utils/Trace.h>
+ 
+ // Macros for including the BufferQueue name in log messages
+-#define ST_LOGV(x, ...) ALOGV("[%s] "x, mConsumerName.string(), ##__VA_ARGS__)
+-#define ST_LOGD(x, ...) ALOGD("[%s] "x, mConsumerName.string(), ##__VA_ARGS__)
+-#define ST_LOGI(x, ...) ALOGI("[%s] "x, mConsumerName.string(), ##__VA_ARGS__)
+-#define ST_LOGW(x, ...) ALOGW("[%s] "x, mConsumerName.string(), ##__VA_ARGS__)
+-#define ST_LOGE(x, ...) ALOGE("[%s] "x, mConsumerName.string(), ##__VA_ARGS__)
++#define ST_LOGV(x, ...) ALOGV("[%s] " x, mConsumerName.string(), ##__VA_ARGS__)
++#define ST_LOGD(x, ...) ALOGD("[%s] " x, mConsumerName.string(), ##__VA_ARGS__)
++#define ST_LOGI(x, ...) ALOGI("[%s] " x, mConsumerName.string(), ##__VA_ARGS__)
++#define ST_LOGW(x, ...) ALOGW("[%s] " x, mConsumerName.string(), ##__VA_ARGS__)
++#define ST_LOGE(x, ...) ALOGE("[%s] " x, mConsumerName.string(), ##__VA_ARGS__)
+ 
+ #define ATRACE_BUFFER_INDEX(index)                                            \
+     if (ATRACE_ENABLED()) {                                                   \
+diff --git a/libs/gui/ConsumerBase.cpp b/libs/gui/ConsumerBase.cpp
+index 4937b17..fac05e9 100644
+--- a/libs/gui/ConsumerBase.cpp
++++ b/libs/gui/ConsumerBase.cpp
+@@ -37,11 +37,11 @@
+ #include <utils/Trace.h>
+ 
+ // Macros for including the ConsumerBase name in log messages
+-#define CB_LOGV(x, ...) ALOGV("[%s] "x, mName.string(), ##__VA_ARGS__)
+-#define CB_LOGD(x, ...) ALOGD("[%s] "x, mName.string(), ##__VA_ARGS__)
+-#define CB_LOGI(x, ...) ALOGI("[%s] "x, mName.string(), ##__VA_ARGS__)
+-#define CB_LOGW(x, ...) ALOGW("[%s] "x, mName.string(), ##__VA_ARGS__)
+-#define CB_LOGE(x, ...) ALOGE("[%s] "x, mName.string(), ##__VA_ARGS__)
++#define CB_LOGV(x, ...) ALOGV("[%s] " x, mName.string(), ##__VA_ARGS__)
++#define CB_LOGD(x, ...) ALOGD("[%s] " x, mName.string(), ##__VA_ARGS__)
++#define CB_LOGI(x, ...) ALOGI("[%s] " x, mName.string(), ##__VA_ARGS__)
++#define CB_LOGW(x, ...) ALOGW("[%s] " x, mName.string(), ##__VA_ARGS__)
++#define CB_LOGE(x, ...) ALOGE("[%s] " x, mName.string(), ##__VA_ARGS__)
+ 
+ namespace android {
+ 
+diff --git a/libs/gui/CpuConsumer.cpp b/libs/gui/CpuConsumer.cpp
+index 0543649..a9c2631 100644
+--- a/libs/gui/CpuConsumer.cpp
++++ b/libs/gui/CpuConsumer.cpp
+@@ -22,11 +22,11 @@
+ #include <utils/Log.h>
+ #include <gui/CpuConsumer.h>
+ 
+-#define CC_LOGV(x, ...) ALOGV("[%s] "x, mName.string(), ##__VA_ARGS__)
+-#define CC_LOGD(x, ...) ALOGD("[%s] "x, mName.string(), ##__VA_ARGS__)
+-#define CC_LOGI(x, ...) ALOGI("[%s] "x, mName.string(), ##__VA_ARGS__)
+-#define CC_LOGW(x, ...) ALOGW("[%s] "x, mName.string(), ##__VA_ARGS__)
+-#define CC_LOGE(x, ...) ALOGE("[%s] "x, mName.string(), ##__VA_ARGS__)
++#define CC_LOGV(x, ...) ALOGV("[%s] " x, mName.string(), ##__VA_ARGS__)
++#define CC_LOGD(x, ...) ALOGD("[%s] " x, mName.string(), ##__VA_ARGS__)
++#define CC_LOGI(x, ...) ALOGI("[%s] " x, mName.string(), ##__VA_ARGS__)
++#define CC_LOGW(x, ...) ALOGW("[%s] " x, mName.string(), ##__VA_ARGS__)
++#define CC_LOGE(x, ...) ALOGE("[%s] " x, mName.string(), ##__VA_ARGS__)
+ 
+ namespace android {
+ 
+diff --git a/services/surfaceflinger/Android.mk b/services/surfaceflinger/Android.mk
+index a25aa52..f84014e 100644
+--- a/services/surfaceflinger/Android.mk
++++ b/services/surfaceflinger/Android.mk
+@@ -45,6 +45,9 @@ ifneq ($(NUM_FRAMEBUFFER_SURFACE_BUFFERS),)
+   LOCAL_CFLAGS += -DNUM_FRAMEBUFFER_SURFACE_BUFFERS=$(NUM_FRAMEBUFFER_SURFACE_BUFFERS)
+ endif
+ 
++# HWComposer.cpp contains 2 pretty bad aliasing violations
++LOCAL_CFLAGS += -fno-strict-aliasing
++
+ LOCAL_SHARED_LIBRARIES := \
+ 	libcutils \
+ 	liblog \
+-- 
+1.8.1.6
+

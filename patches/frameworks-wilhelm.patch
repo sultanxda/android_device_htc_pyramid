@@ -1,0 +1,307 @@
+From 16fd988a8cc6b9612e94525a8948932e20d95acb Mon Sep 17 00:00:00 2001
+From: Bernhard Rosenkraenzer <Bernhard.Rosenkranzer@linaro.org>
+Date: Wed, 15 Aug 2012 20:38:18 +0200
+Subject: [PATCH] wilhelm: Fix aliasing violations
+
+Change-Id: I73a394cd9a87b6aa64ed101309aeb97e18096f14
+Signed-off-by: Bernhard Rosenkraenzer <Bernhard.Rosenkranzer@linaro.org>
+---
+ src/android/AudioPlayer_to_android.cpp |  5 ++++-
+ src/android/BufferQueueSource.cpp      |  4 ++--
+ src/android/android_Effect.cpp         | 40 ++++++++++++++++++++++------------
+ src/android/android_StreamPlayer.cpp   |  4 ++--
+ src/itf/IAndroidBufferQueue.c          |  5 +++--
+ src/itf/IAndroidEffectCapabilities.c   |  4 ++--
+ src/locks.c                            | 36 +++++++++++++++++++++---------
+ tests/examples/Android.mk              |  4 ++++
+ 8 files changed, 69 insertions(+), 33 deletions(-)
+
+diff --git a/src/android/AudioPlayer_to_android.cpp b/src/android/AudioPlayer_to_android.cpp
+index 43a9353..e1b2cb1 100644
+--- a/src/android/AudioPlayer_to_android.cpp
++++ b/src/android/AudioPlayer_to_android.cpp
+@@ -1896,14 +1896,17 @@ SLresult android_audioPlayer_metadata_getValue(CAudioPlayer *ap,
+                     static_cast<android::AudioSfDecoder*>(ap->mAPlayer.get());
+             pValue->encoding = SL_CHARACTERENCODING_BINARY;
+             memcpy((char *) pValue->langCountry, "en", 3); // applicable here?
++            SLuint32 valueData;
+             SLuint32 valueSize = 0;
++            memcpy(&valueData, &pValue->data, sizeof(SLuint32));
+             if ((size < sizeof(SLMetadataInfo)
+                     || (!decoder->getPcmFormatValueSize(index, &valueSize))
+                     || (!decoder->getPcmFormatKeyValue(index, size - sizeof(SLMetadataInfo),
+-                            (SLuint32*)pValue->data)))) {
++                            &valueData)))) {
+                 res = SL_RESULT_PARAMETER_INVALID;
+             } else {
+                 pValue->size = valueSize;
++                memcpy(&pValue->data, &valueData, sizeof(pValue->data));
+             }
+         }
+         break;
+diff --git a/src/android/BufferQueueSource.cpp b/src/android/BufferQueueSource.cpp
+index 6cf04fb..ec3ae75 100644
+--- a/src/android/BufferQueueSource.cpp
++++ b/src/android/BufferQueueSource.cpp
+@@ -29,7 +29,7 @@
+ namespace android {
+ 
+ 
+-const SLuint32 BufferQueueSource::kItemProcessed[NB_BUFFEREVENT_ITEM_FIELDS] = {
++const SLuint32 BufferQueueSource::kItemProcessed[NB_BUFFEREVENT_ITEM_FIELDS] __attribute__((may_alias)) = {
+         SL_ANDROID_ITEMKEY_BUFFERQUEUEEVENT, // item key
+         sizeof(SLuint32),                    // item size
+         SL_ANDROIDBUFFERQUEUEEVENT_PROCESSED // item data
+@@ -150,7 +150,7 @@ ssize_t BufferQueueSource::readAt(off64_t offset, void *data, size_t size) {
+         SLresult result = (*callback)(&mAndroidBufferQueueSource->mItf, callbackPContext,
+                 pBufferContext, pBufferData, dataSize, dataUsed,
+                 // no messages during playback other than marking the buffer as processed
+-                (const SLAndroidBufferItem*)(&kItemProcessed) /* pItems */,
++                (SLAndroidBufferItem*)((void*)&kItemProcessed) /* pItems */,
+                 NB_BUFFEREVENT_ITEM_FIELDS * sizeof(SLuint32) /* itemsLength */ );
+         if (SL_RESULT_SUCCESS != result) {
+             // Reserved for future use
+diff --git a/src/android/android_Effect.cpp b/src/android/android_Effect.cpp
+index a8e69ad..180f368 100644
+--- a/src/android/android_Effect.cpp
++++ b/src/android/android_Effect.cpp
+@@ -189,13 +189,15 @@ uint32_t erev_valueSize(int32_t param) {
+         int32_t param, int32_t param2, void *pValue)
+ {
+      android::status_t status;
+-     uint32_t buf32[(EQUALIZER_PARAM_SIZE_MAX - 1) / sizeof(uint32_t) + 1];
+-     effect_param_t *p = (effect_param_t *)buf32;
++     union {
++         uint32_t buf32[(EQUALIZER_PARAM_SIZE_MAX - 1) / sizeof(uint32_t) + 1];
++         effect_param_t *p;
++     };
+ 
+      p->psize = eq_paramSize(param);
+-     *(int32_t *)p->data = param;
++     memcpy(p->data, &param, sizeof(param));
+      if (p->psize == 2 * sizeof(int32_t)) {
+-         *((int32_t *)p->data + 1) = param2;
++         memcpy(p->data+sizeof(int32_t), &param2, sizeof(param2));
+      }
+      p->vsize = eq_valueSize(param);
+      status = pFx->getParameter(p);
+@@ -215,13 +217,15 @@ uint32_t erev_valueSize(int32_t param) {
+         int32_t param, int32_t param2, void *pValue)
+ {
+     android::status_t status;
+-    uint32_t buf32[(EQUALIZER_PARAM_SIZE_MAX - 1) / sizeof(uint32_t) + 1];
+-    effect_param_t *p = (effect_param_t *)buf32;
++    union {
++        uint32_t buf32[(EQUALIZER_PARAM_SIZE_MAX - 1) / sizeof(uint32_t) + 1];
++        effect_param_t *p;
++    };
+ 
+     p->psize = eq_paramSize(param);
+-    *(int32_t *)p->data = param;
++    memcpy(p->data, &param, sizeof(int32_t));
+     if (p->psize == 2 * sizeof(int32_t)) {
+-        *((int32_t *)p->data + 1) = param2;
++        memcpy(p->data+sizeof(int32_t), &param2, sizeof(param2));
+     }
+     p->vsize = eq_valueSize(param);
+     memcpy(p->data + p->psize, pValue, p->vsize);
+@@ -563,17 +567,21 @@ SLresult android_fxSend_attachToAux(CAudioPlayer* ap, SLInterfaceID pUuid, SLboo
+ {
+ 
+     android::status_t status;
+-    uint32_t buf32[(paramSizeMax - 1) / sizeof(uint32_t) + 1];
+-    effect_param_t *p = (effect_param_t *)buf32;
++    union {
++        uint32_t *buf32;
++        effect_param_t *p;
++    };
++    buf32=new uint32_t[(paramSizeMax - 1) / sizeof(uint32_t) + 1];
+ 
+     p->psize = sizeof(int32_t);
+-    *(int32_t *)p->data = param;
++    memcpy(p->data, &param, sizeof(param));
+     p->vsize = valueSize;
+     memcpy(p->data + p->psize, pValue, p->vsize);
+     status = pFx->setParameter(p);
+     if (android::NO_ERROR == status) {
+         status = p->status;
+     }
++    delete[] buf32;
+     return status;
+ }
+ 
+@@ -583,11 +591,14 @@ SLresult android_fxSend_attachToAux(CAudioPlayer* ap, SLInterfaceID pUuid, SLboo
+         int32_t param, uint32_t paramSizeMax, void *pValue, uint32_t valueSize)
+ {
+     android::status_t status;
+-    uint32_t buf32[(paramSizeMax - 1) / sizeof(uint32_t) + 1];
+-    effect_param_t *p = (effect_param_t *)buf32;
++    union {
++        uint32_t *buf32;
++        effect_param_t *p;
++    };
++    buf32=new uint32_t[(paramSizeMax - 1) / sizeof(uint32_t) + 1];
+ 
+     p->psize = sizeof(int32_t);
+-    *(int32_t *)p->data = param;
++    memcpy(p->data, &param, sizeof(param));
+     p->vsize = valueSize;
+     status = pFx->getParameter(p);
+     if (android::NO_ERROR == status) {
+@@ -597,6 +608,7 @@ SLresult android_fxSend_attachToAux(CAudioPlayer* ap, SLInterfaceID pUuid, SLboo
+         }
+     }
+ 
++    delete[] buf32;
+     return status;
+ }
+ 
+diff --git a/src/android/android_StreamPlayer.cpp b/src/android/android_StreamPlayer.cpp
+index f66b85e..729f34d 100644
+--- a/src/android/android_StreamPlayer.cpp
++++ b/src/android/android_StreamPlayer.cpp
+@@ -50,7 +50,7 @@
+     disconnect();
+ }
+ 
+-const SLuint32 StreamSourceAppProxy::kItemProcessed[NB_BUFFEREVENT_ITEM_FIELDS] = {
++const SLuint32 StreamSourceAppProxy::kItemProcessed[NB_BUFFEREVENT_ITEM_FIELDS] __attribute__((may_alias)) = {
+         SL_ANDROID_ITEMKEY_BUFFERQUEUEEVENT, // item key
+         sizeof(SLuint32),                    // item size
+         SL_ANDROIDBUFFERQUEUEEVENT_PROCESSED // item data
+@@ -281,7 +281,7 @@ void StreamSourceAppProxy::pullFromBuffQueue() {
+                 pBufferContext, pBufferData, dataSize,
+                 dataSize, /* dataUsed  */
+                 // no messages during playback other than marking the buffer as processed
+-                (const SLAndroidBufferItem*)(&kItemProcessed) /* pItems */,
++                (const SLAndroidBufferItem*)((const void*)(&kItemProcessed)) /* pItems */,
+                 NB_BUFFEREVENT_ITEM_FIELDS *sizeof(SLuint32) /* itemsLength */ );
+         if (SL_RESULT_SUCCESS != result) {
+             // Reserved for future use
+diff --git a/src/itf/IAndroidBufferQueue.c b/src/itf/IAndroidBufferQueue.c
+index 289fbc4..18a8843 100644
+--- a/src/itf/IAndroidBufferQueue.c
++++ b/src/itf/IAndroidBufferQueue.c
+@@ -110,7 +110,7 @@ static SLresult setItems(SLuint32 dataLength,
+                     //SL_LOGD("Found DISCONTINUITYevent=%d", pBuff->mItems.mTsCmdData.mTsCmdCode);
+                 } else if (pItems->itemSize == sizeof(SLAuint64)) {
+                     pBuff->mItems.mTsCmdData.mTsCmdCode |= ANDROID_MP2TSEVENT_DISCON_NEWPTS;
+-                    pBuff->mItems.mTsCmdData.mPts = *((SLAuint64*)pItems->itemData);
++                    memcpy(&pBuff->mItems.mTsCmdData.mPts, pItems->itemData, sizeof(SLAuint64));
+                     //SL_LOGD("Found PTS=%lld", pBuff->mItems.mTsCmdData.mPts);
+                 } else {
+                     SL_LOGE("Invalid item parameter size %u for MPEG-2 PTS", pItems->itemSize);
+@@ -124,7 +124,8 @@ static SLresult setItems(SLuint32 dataLength,
+                     SL_LOGV("Received format change with no data == full format change");
+                     pBuff->mItems.mTsCmdData.mTsCmdCode |= ANDROID_MP2TSEVENT_FORMAT_CHANGE_FULL;
+                 } else if (pItems->itemSize == sizeof(SLuint32)) {
+-                    XAuint32 formatData = *((XAuint32*)pItems->itemData);
++                    XAuint32 formatData;// = *((XAuint32*)pItems->itemData);
++                    memcpy(&formatData, pItems->itemData, sizeof(XAuint32));
+                     // intentionally only supporting video change when reading which specific
+                     //    stream has changed, interpret other changes as full change
+                     if (formatData == XA_ANDROID_FORMATCHANGE_ITEMDATA_VIDEO) {
+diff --git a/src/itf/IAndroidEffectCapabilities.c b/src/itf/IAndroidEffectCapabilities.c
+index 923b6a7..29ef53d 100644
+--- a/src/itf/IAndroidEffectCapabilities.c
++++ b/src/itf/IAndroidEffectCapabilities.c
+@@ -52,10 +52,10 @@ static SLresult IAndroidEffectCapabilities_QueryEffect(SLAndroidEffectCapabiliti
+     } else {
+         interface_lock_shared(thiz);
+         if (NULL != pEffectType) {
+-            *pEffectType = (SLInterfaceID) &thiz->mFxDescriptors[index].type;
++            memcpy(pEffectType, &thiz->mFxDescriptors[index].type, sizeof(SLInterfaceID));
+         }
+         if (NULL != pEffectImplementation) {
+-            *pEffectImplementation = (SLInterfaceID) &thiz->mFxDescriptors[index].uuid;
++            memcpy(pEffectImplementation, &thiz->mFxDescriptors[index].uuid, sizeof(SLInterfaceID));
+         }
+         if ((NULL != pName) && (0 < *pNameSize)) {
+             int len = strlen(thiz->mFxDescriptors[index].name);
+diff --git a/src/locks.c b/src/locks.c
+index d95c23a..4b94ddb 100644
+--- a/src/locks.c
++++ b/src/locks.c
+@@ -66,13 +66,21 @@ void object_lock_exclusive_(IObject *thiz, const char *file, int line)
+             if (++i >= (sizeof(backoffs) / sizeof(backoffs[0]))) {
+                 // the extra block avoids a C++ compiler error about goto past initialization
+                 {
+-                    pthread_t me = pthread_self();
+-                    pthread_t owner = thiz->mOwner;
++                    union {
++                        pthread_t me;
++                        void *pMe;
++                    };
++                    me = pthread_self();
++                    union {
++                        pthread_t owner;
++                        void *pOwner;
++                    };
++                    owner = thiz->mOwner;
+                     // unlikely, but this could result in a memory fault if owner is corrupt
+                     pid_t ownerTid = LIKELY_VALID(owner) ? __pthread_gettid(owner) : -1;
+                     SL_LOGW("%s:%d: pthread %p (tid %d) sees object %p was locked by pthread %p"
+-                            " (tid %d) at %s:%d\n", file, line, *(void **)&me, gettid(), thiz,
+-                            *(void **)&owner, ownerTid, thiz->mFile, thiz->mLine);
++                            " (tid %d) at %s:%d\n", file, line, pMe, gettid(), thiz,
++                            pOwner, ownerTid, thiz->mFile, thiz->mLine);
+                 }
+ forward_progress:
+                 // attempt one more time without timeout; maybe this time we will be successful
+@@ -86,17 +94,25 @@ void object_lock_exclusive_(IObject *thiz, const char *file, int line)
+     pthread_t zero;
+     memset(&zero, 0, sizeof(pthread_t));
+     if (0 != memcmp(&zero, &thiz->mOwner, sizeof(pthread_t))) {
+-        pthread_t me = pthread_self();
+-        pthread_t owner = thiz->mOwner;
++        union {
++            pthread_t me;
++            void *pMe;
++        };
++        me = pthread_self();
++        union {
++            pthread_t owner;
++            void *pOwner;
++        };
++        owner = thiz->mOwner;
+         pid_t ownerTid = LIKELY_VALID(owner) ? __pthread_gettid(owner) : -1;
+         if (pthread_equal(pthread_self(), owner)) {
+             SL_LOGE("%s:%d: pthread %p (tid %d) sees object %p was recursively locked by pthread"
+-                    " %p (tid %d) at %s:%d\n", file, line, *(void **)&me, gettid(), thiz,
+-                    *(void **)&owner, ownerTid, thiz->mFile, thiz->mLine);
++                    " %p (tid %d) at %s:%d\n", file, line, pMe, gettid(), thiz,
++                    pOwner, ownerTid, thiz->mFile, thiz->mLine);
+         } else {
+             SL_LOGE("%s:%d: pthread %p (tid %d) sees object %p was left unlocked in unexpected"
+-                    " state by pthread %p (tid %d) at %s:%d\n", file, line, *(void **)&me, gettid(),
+-                    thiz, *(void **)&owner, ownerTid, thiz->mFile, thiz->mLine);
++                    " state by pthread %p (tid %d) at %s:%d\n", file, line, pMe, gettid(),
++                    thiz, pOwner, ownerTid, thiz->mFile, thiz->mLine);
+         }
+         assert(false);
+     }
+diff --git a/tests/examples/Android.mk b/tests/examples/Android.mk
+index d16164e..81816ec 100644
+--- a/tests/examples/Android.mk
++++ b/tests/examples/Android.mk
+@@ -260,6 +260,8 @@ LOCAL_SHARED_LIBRARIES := \
+ 	libutils \
+ 	libOpenSLES
+ 
++LOCAL_CFLAGS += -fno-strict-aliasing
++
+ ifeq ($(TARGET_OS),linux)
+ 	LOCAL_CFLAGS += -DXP_UNIX
+ endif
+@@ -287,6 +289,8 @@ LOCAL_SHARED_LIBRARIES := \
+ 
+ LOCAL_STATIC_LIBRARIES := libcpustats
+ 
++LOCAL_CFLAGS := -fno-strict-aliasing
++
+ ifeq ($(TARGET_OS),linux)
+ 	LOCAL_CFLAGS += -DXP_UNIX
+ endif
+-- 
+1.8.1.6
+

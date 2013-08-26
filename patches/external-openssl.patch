@@ -1,0 +1,32 @@
+From 5b87d2fc96432062f0229dfcca013d9657d3c264 Mon Sep 17 00:00:00 2001
+From: Bernhard Rosenkraenzer <Bernhard.Rosenkranzer@linaro.org>
+Date: Thu, 8 Dec 2011 17:34:26 +0059
+Subject: [PATCH] openssl: Build with -fno-strict-aliasing
+
+OpenSSL contains numerous aliasing violations, in places
+that are hard to fix without breaking API and ABI.
+Disable the optimization locally so we can build other
+parts of the tree with strict-aliasing
+
+Signed-off-by: Bernhard Rosenkraenzer <Bernhard.Rosenkranzer@linaro.org>
+---
+ android-config.mk | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/android-config.mk b/android-config.mk
+index 80955b5..29a3007 100644
+--- a/android-config.mk
++++ b/android-config.mk
+@@ -23,5 +23,9 @@ LOCAL_CFLAGS += \
+ # Intentionally excluded http://b/7079965
+ LOCAL_CFLAGS := $(filter-out -DZLIB, $(LOCAL_CFLAGS))
+ 
++# OpenSSL isn't ready to be built with strict aliasing, and fixing it without
++# breaking both API and ABI is hard
++LOCAL_CFLAGS += -fno-strict-aliasing
++
+ # Debug
+ # LOCAL_CFLAGS += -DCIPHER_DEBUG
+-- 
+1.8.1.6
+

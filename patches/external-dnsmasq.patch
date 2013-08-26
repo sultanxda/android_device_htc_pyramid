@@ -1,0 +1,42 @@
+From 605ebfa8d1cd23457310f7a823dc2dfb670f53f6 Mon Sep 17 00:00:00 2001
+From: Bernhard Rosenkraenzer <Bernhard.Rosenkranzer@linaro.org>
+Date: Fri, 4 May 2012 20:52:18 +0200
+Subject: [PATCH] dnsmasq: Fix aliasing violations
+
+Signed-off-by: Bernhard Rosenkraenzer <Bernhard.Rosenkranzer@linaro.org>
+---
+ src/dnsmasq.h | 3 +++
+ src/rfc2131.c | 2 +-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/dnsmasq.h b/src/dnsmasq.h
+index c4fda28..e4c2ff9 100755
+--- a/src/dnsmasq.h
++++ b/src/dnsmasq.h
+@@ -564,7 +564,10 @@ struct dhcp_packet {
+   u16 secs, flags;
+   struct in_addr ciaddr, yiaddr, siaddr, giaddr;
+   u8 chaddr[DHCP_CHADDR_MAX], sname[64], file[128];
++  union {
+   u8 options[312];
++  u32 options32[312/4];
++  };
+ };
+ 
+ struct ping_result {
+diff --git a/src/rfc2131.c b/src/rfc2131.c
+index 1ef8569..6226c32 100755
+--- a/src/rfc2131.c
++++ b/src/rfc2131.c
+@@ -167,7 +167,7 @@ size_t dhcp_reply(struct dhcp_context *context, char *iface_name, int int_index,
+       mess_type = option_uint(opt, 0, 1);
+ 
+       /* only insist on a cookie for DHCP. */
+-      if (*((u32 *)&mess->options) != htonl(DHCP_COOKIE))
++      if (*mess->options32 != htonl(DHCP_COOKIE))
+ 	return 0;
+ 
+       /* two things to note here: expand_buf may move the packet,
+-- 
+1.8.1.6
+

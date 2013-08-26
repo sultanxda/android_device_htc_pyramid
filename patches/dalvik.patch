@@ -1,0 +1,70 @@
+From 94e2e7f6c71586642914022f838ef46d59f247cc Mon Sep 17 00:00:00 2001
+From: Sultanxda <sultanxda@gmail.com>
+Date: Sun, 25 Aug 2013 01:44:23 -0700
+Subject: [PATCH] Strict aliasing fix (credit: IAmTheOneTheyCallNeo)
+
+---
+ vm/Android.mk | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/vm/Android.mk b/vm/Android.mk
+index 1c6036c..3779de3 100644
+--- a/vm/Android.mk
++++ b/vm/Android.mk
+@@ -45,7 +45,7 @@ include $(LOCAL_PATH)/ReconfigureDvm.mk
+ 
+ # Overwrite default settings
+ LOCAL_MODULE := libdvm
+-LOCAL_CFLAGS += $(target_smp_flag)
++LOCAL_CFLAGS += $(target_smp_flag) -fno-strict-aliasing
+ ifeq ($(TARGET_ARCH_LOWMEM),true)
+     LOCAL_CFLAGS += -DDALVIK_LOWMEM
+ endif
+@@ -55,7 +55,7 @@ endif
+ ifneq ($(strip $(WITH_ADDRESS_SANITIZER)),)
+     LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/asan
+     LOCAL_ADDRESS_SANITIZER := true
+-    LOCAL_CFLAGS := $(filter-out $(CLANG_CONFIG_UNKNOWN_CFLAGS),$(LOCAL_CFLAGS))
++    LOCAL_CFLAGS := $(filter-out $(CLANG_CONFIG_UNKNOWN_CFLAGS),$(LOCAL_CFLAGS)) -fno-strict-aliasing
+ endif
+ 
+ # TODO: split out the asflags.
+@@ -67,7 +67,7 @@ include $(BUILD_SHARED_LIBRARY)
+ # Enable assertions and JIT tuning
+ include $(LOCAL_PATH)/ReconfigureDvm.mk
+ LOCAL_CFLAGS += -UNDEBUG -DDEBUG=1 -DLOG_NDEBUG=1 -DWITH_DALVIK_ASSERT \
+-                -DWITH_JIT_TUNING $(target_smp_flag)
++                -DWITH_JIT_TUNING $(target_smp_flag) -fno-strict-aliasing
+ # TODO: split out the asflags.
+ LOCAL_ASFLAGS := $(LOCAL_CFLAGS)
+ LOCAL_MODULE := libdvm_assert
+@@ -79,7 +79,7 @@ ifneq ($(dvm_arch),mips)    # MIPS support for self-verification is incomplete
+     # Enable assertions and JIT self-verification
+     include $(LOCAL_PATH)/ReconfigureDvm.mk
+     LOCAL_CFLAGS += -UNDEBUG -DDEBUG=1 -DLOG_NDEBUG=1 -DWITH_DALVIK_ASSERT \
+-                    -DWITH_SELF_VERIFICATION $(target_smp_flag)
++                    -DWITH_SELF_VERIFICATION $(target_smp_flag) -fno-strict-aliasing
+     # TODO: split out the asflags.
+     LOCAL_ASFLAGS := $(LOCAL_CFLAGS)
+     LOCAL_MODULE := libdvm_sv
+@@ -91,7 +91,7 @@ endif # dvm_arch!=mips
+ # Compile out the JIT
+ WITH_JIT := false
+ include $(LOCAL_PATH)/ReconfigureDvm.mk
+-LOCAL_CFLAGS += $(target_smp_flag)
++LOCAL_CFLAGS += $(target_smp_flag) -fno-strict-aliasing
+ # TODO: split out the asflags.
+ LOCAL_ASFLAGS := $(LOCAL_CFLAGS)
+ LOCAL_MODULE := libdvm_interp
+@@ -137,7 +137,7 @@ ifeq ($(WITH_HOST_DALVIK),true)
+             $(patsubst libffi, ,$(LOCAL_SHARED_LIBRARIES))
+     endif
+ 
+-    LOCAL_CFLAGS += $(host_smp_flag)
++    LOCAL_CFLAGS += $(host_smp_flag) -fno-strict-aliasing
+     # TODO: split out the asflags.
+     LOCAL_ASFLAGS := $(LOCAL_CFLAGS)
+     ifeq ($(TARGET_ARCH_LOWMEM),true)
+-- 
+1.8.1.6
+

@@ -1,0 +1,31 @@
+From db026e0d34539aa1e837fb2bb3787b6fd0c3ede6 Mon Sep 17 00:00:00 2001
+From: Bernhard Rosenkraenzer <Bernhard.Rosenkranzer@linaro.org>
+Date: Tue, 21 Aug 2012 00:04:25 +0200
+Subject: [PATCH] libcore/luni: Use -fno-strict-aliasing for now
+
+This will be reverted once we have a proper fix.
+
+Change-Id: Iab4663a5f96ff9770371f54697aa872260037ac1
+Signed-off-by: Bernhard Rosenkraenzer <Bernhard.Rosenkranzer@linaro.org>
+---
+ NativeCode.mk | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/NativeCode.mk b/NativeCode.mk
+index b7c8b0e..ca6e79d 100644
+--- a/NativeCode.mk
++++ b/NativeCode.mk
+@@ -91,6 +91,10 @@ core_c_includes := $(sort libcore/include $(LOCAL_C_INCLUDES) $(JNI_H_INCLUDE))
+ core_shared_libraries := $(sort $(LOCAL_SHARED_LIBRARIES))
+ core_static_libraries := $(sort $(LOCAL_STATIC_LIBRARIES))
+ 
++core_cflags := -fvisibility=hidden -fno-strict-aliasing
++core_cflags += '-DGCC_HIDDEN=__attribute__((visibility("hidden")))'
++core_cppflags := -fvisibility-inlines-hidden -fno-strict-aliasing
++
+ 
+ #
+ # Build for the target (device).
+-- 
+1.8.1.6
+

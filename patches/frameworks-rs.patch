@@ -1,0 +1,179 @@
+From c5b89ee45b593f5f219caf590232fdbdc3bdc303 Mon Sep 17 00:00:00 2001
+From: David Eddlemon <DavidEddlemon@Hotmail.com>
+Date: Mon, 19 Aug 2013 22:13:27 +0400
+Subject: [PATCH] Strict Aliasing Fix
+
+---
+ Android.mk                     | 19 ++++++++++---------
+ cpp/Android.mk                 |  2 +-
+ cpu_ref/Android.mk             |  2 +-
+ tests/cppallocation/Android.mk |  1 +
+ tests/cppbasic/Android.mk      |  1 +
+ tests/cppstrided/Android.mk    |  1 +
+ tests/latency/Android.mk       |  1 +
+ 7 files changed, 16 insertions(+), 11 deletions(-)
+
+diff --git a/Android.mk b/Android.mk
+index 42a018e..eec210b 100644
+--- a/Android.mk
++++ b/Android.mk
+@@ -1,13 +1,13 @@
+ 
+ LOCAL_PATH:=$(call my-dir)
+ 
+-rs_base_CFLAGS := -Werror -Wall -Wno-unused-parameter -Wno-unused-variable
++rs_base_CFLAGS := -Wno-error -Wall -Wno-unused-parameter -Wno-unused-variable -fno-strict-aliasing $(call-cc-cpp-option,-Qunused-arguments)
+ ifeq ($(TARGET_BUILD_PDK), true)
+-  rs_base_CFLAGS += -D__RS_PDK__
++  rs_base_CFLAGS += -D__RS_PDK__ -fno-strict-aliasing $(call-cc-cpp-option,-Qunused-arguments)
+ endif
+ 
+ ifneq ($(OVERRIDE_RS_DRIVER),)
+-  rs_base_CFLAGS += -DOVERRIDE_RS_DRIVER=$(OVERRIDE_RS_DRIVER)
++  rs_base_CFLAGS += -DOVERRIDE_RS_DRIVER=$(OVERRIDE_RS_DRIVER) -fno-strict-aliasing
+ endif
+ 
+ include $(CLEAR_VARS)
+@@ -41,7 +41,7 @@ LOCAL_SHARED_LIBRARIES += libbcc libbcinfo libLLVM libui libgui libsync
+ 
+ LOCAL_C_INCLUDES += frameworks/compile/libbcc/include
+ 
+-LOCAL_CFLAGS += $(rs_base_CFLAGS)
++LOCAL_CFLAGS += $(rs_base_CFLAGS) -fno-strict-aliasing
+ 
+ LOCAL_LDLIBS := -lpthread -ldl
+ LOCAL_MODULE_TAGS := optional
+@@ -155,7 +155,7 @@ LOCAL_STATIC_LIBRARIES := libft2
+ LOCAL_C_INCLUDES += external/freetype/include
+ LOCAL_C_INCLUDES += frameworks/compile/libbcc/include
+ 
+-LOCAL_CFLAGS += $(rs_base_CFLAGS)
++LOCAL_CFLAGS += $(rs_base_CFLAGS) -fno-strict-aliasing
+ 
+ LOCAL_LDLIBS := -lpthread -ldl
+ LOCAL_MODULE_TAGS := optional
+@@ -202,6 +202,7 @@ LOCAL_GENERATED_SOURCES += $(GEN)
+ LOCAL_CFLAGS += $(rs_base_CFLAGS)
+ LOCAL_CFLAGS += -DANDROID_RS_SERIALIZE
+ LOCAL_CFLAGS += -fPIC
++LOCAL_CFLAGS += -fno-strict-aliasing
+ 
+ LOCAL_SRC_FILES:= \
+ 	rsAdapter.cpp \
+@@ -275,7 +276,7 @@ LOCAL_SRC_FILES := $(rsloader_SRC_FILES)
+ 
+ LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
+ 
+-LOCAL_CFLAGS += $(rs_base_CFLAGS)
++LOCAL_CFLAGS += $(rs_base_CFLAGS) -fno-strict-aliasing
+ 
+ LOCAL_C_INCLUDES := \
+   $(LOCAL_PATH)/driver/linkloader \
+@@ -302,6 +303,7 @@ LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
+ 
+ LOCAL_CFLAGS += $(rs_base_CFLAGS)
+ LOCAL_CFLAGS += -D__HOST__
++LOCAL_CFLAGS += -fno-strict-aliasing
+ 
+ LOCAL_C_INCLUDES := \
+   $(LOCAL_PATH)/driver/linkloader \
+@@ -336,12 +338,11 @@ LOCAL_SRC_FILES := \
+ 
+ LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
+ 
+-LOCAL_CFLAGS += $(rs_base_CFLAGS)
++LOCAL_CFLAGS += $(rs_base_CFLAGS) -fno-strict-aliasing
+ 
+ LOCAL_C_INCLUDES := \
+   $(LOCAL_PATH)/driver/linkloader \
+   $(LOCAL_PATH)/driver/linkloader/include
+-
+ include $(LLVM_ROOT_PATH)/llvm-device-build.mk
+ include $(BUILD_EXECUTABLE)
+ 
+@@ -371,7 +372,7 @@ LOCAL_SRC_FILES := \
+ 
+ LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
+ 
+-LOCAL_CFLAGS += $(rs_base_CFLAGS)
++LOCAL_CFLAGS += $(rs_base_CFLAGS) -fno-strict-aliasing
+ 
+ LOCAL_C_INCLUDES := \
+   $(LOCAL_PATH)/driver/linkloader \
+diff --git a/cpp/Android.mk b/cpp/Android.mk
+index 145f487..57857db 100644
+--- a/cpp/Android.mk
++++ b/cpp/Android.mk
+@@ -11,7 +11,7 @@ else
+ endif
+ local_cflags_for_rs_cpp += -DRS_VERSION=$(RS_VERSION)
+ 
+-LOCAL_CFLAGS += $(local_cflags_for_rs_cpp)
++LOCAL_CFLAGS += $(local_cflags_for_rs_cpp) $(call-cc-cpp-option,-Qunused-arguments)
+ 
+ LOCAL_SRC_FILES:= \
+ 	RenderScript.cpp \
+diff --git a/cpu_ref/Android.mk b/cpu_ref/Android.mk
+index 67e0786..d225cb0 100644
+--- a/cpu_ref/Android.mk
++++ b/cpu_ref/Android.mk
+@@ -1,7 +1,7 @@
+ 
+ LOCAL_PATH:=$(call my-dir)
+ 
+-rs_base_CFLAGS := -Werror -Wall -Wno-unused-parameter -Wno-unused-variable
++rs_base_CFLAGS := -Wno-error -Wall -Wno-unused-parameter -Wno-unused-variable $(call-cc-cpp-option,-Qunused-arguments)
+ ifeq ($(TARGET_BUILD_PDK), true)
+   rs_base_CFLAGS += -D__RS_PDK__
+ endif
+diff --git a/tests/cppallocation/Android.mk b/tests/cppallocation/Android.mk
+index 32e1844..a128bdf 100644
+--- a/tests/cppallocation/Android.mk
++++ b/tests/cppallocation/Android.mk
+@@ -29,6 +29,7 @@ LOCAL_C_INCLUDES += frameworks/rs/cpp
+ LOCAL_C_INCLUDES += frameworks/rs
+ LOCAL_C_INCLUDES += $(intermediates)
+ 
++LOCAL_CFLAGS := $(call-cc-cpp-option,-Qunused-arguments)
+ 
+ include $(BUILD_EXECUTABLE)
+ 
+diff --git a/tests/cppbasic/Android.mk b/tests/cppbasic/Android.mk
+index 5c2c53a..26d73a3 100644
+--- a/tests/cppbasic/Android.mk
++++ b/tests/cppbasic/Android.mk
+@@ -29,6 +29,7 @@ LOCAL_C_INCLUDES += frameworks/rs/cpp
+ LOCAL_C_INCLUDES += frameworks/rs
+ LOCAL_C_INCLUDES += $(intermediates)
+ 
++LOCAL_CFLAGS := $(call-cc-cpp-option,-Qunused-arguments)
+ 
+ include $(BUILD_EXECUTABLE)
+ 
+diff --git a/tests/cppstrided/Android.mk b/tests/cppstrided/Android.mk
+index febfd38..7c248f0 100644
+--- a/tests/cppstrided/Android.mk
++++ b/tests/cppstrided/Android.mk
+@@ -29,6 +29,7 @@ LOCAL_C_INCLUDES += frameworks/rs/cpp
+ LOCAL_C_INCLUDES += frameworks/rs
+ LOCAL_C_INCLUDES += $(intermediates)
+ 
++LOCAL_CFLAGS := $(call-cc-cpp-option,-Qunused-arguments)
+ 
+ include $(BUILD_EXECUTABLE)
+ 
+diff --git a/tests/latency/Android.mk b/tests/latency/Android.mk
+index b11536d..d84767e 100644
+--- a/tests/latency/Android.mk
++++ b/tests/latency/Android.mk
+@@ -29,6 +29,7 @@ LOCAL_C_INCLUDES += frameworks/rs/cpp
+ LOCAL_C_INCLUDES += frameworks/rs
+ LOCAL_C_INCLUDES += $(intermediates)
+ 
++LOCAL_CFLAGS := $(call-cc-cpp-option,-Qunused-arguments)
+ 
+ include $(BUILD_EXECUTABLE)
+ 
+-- 
+1.8.1.6
+

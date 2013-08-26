@@ -1,0 +1,305 @@
+From 0b6178cdee2a5bb3fff706631c8d3eac817c45cc Mon Sep 17 00:00:00 2001
+From: David Eddlemon <neo@TheMatrix.com>
+Date: Tue, 9 Jul 2013 03:18:25 +0400
+Subject: [PATCH] Strict Aliasing Fix. Optional Compiler Flags Fix
+
+---
+ Android.mk                             | 4 ++++
+ lib/ARCMigrate/Android.mk              | 2 ++
+ lib/AST/Android.mk                     | 2 ++
+ lib/Analysis/Android.mk                | 2 ++
+ lib/Basic/Android.mk                   | 2 ++
+ lib/CodeGen/Android.mk                 | 2 ++
+ lib/Driver/Android.mk                  | 2 ++
+ lib/Edit/Android.mk                    | 2 ++
+ lib/Frontend/Android.mk                | 2 ++
+ lib/FrontendTool/Android.mk            | 2 ++
+ lib/Lex/Android.mk                     | 2 ++
+ lib/Parse/Android.mk                   | 2 ++
+ lib/Rewrite/Core/Android.mk            | 1 +
+ lib/Rewrite/Frontend/Android.mk        | 1 +
+ lib/Sema/Android.mk                    | 2 ++
+ lib/Serialization/Android.mk           | 1 +
+ lib/StaticAnalyzer/Checkers/Android.mk | 2 ++
+ lib/StaticAnalyzer/Core/Android.mk     | 2 ++
+ lib/StaticAnalyzer/Frontend/Android.mk | 2 ++
+ tools/driver/Android.mk                | 2 ++
+ utils/TableGen/Android.mk              | 2 ++
+ 21 files changed, 41 insertions(+)
+
+diff --git a/Android.mk b/Android.mk
+index 3f5f0ba..17b6781 100644
+--- a/Android.mk
++++ b/Android.mk
+@@ -27,7 +27,11 @@ subdirs := $(addprefix $(LOCAL_PATH)/,$(addsuffix /Android.mk, \
+   utils/TableGen \
+   ))
+ 
++LOCAL_CFLAGS := $(call-cc-option,-Qunused-arguments)
++
+ include $(LOCAL_PATH)/clang.mk
+ include $(LOCAL_PATH)/host_shared_clang.mk
+ 
+ include $(subdirs)
++
++LOCAL_CFLAGS += -fno-strict-aliasing
+diff --git a/lib/ARCMigrate/Android.mk b/lib/ARCMigrate/Android.mk
+index 5ee7191..9833bc9 100644
+--- a/lib/ARCMigrate/Android.mk
++++ b/lib/ARCMigrate/Android.mk
+@@ -43,6 +43,8 @@ LOCAL_SRC_FILES := $(clang_arc_migrate_SRC_FILES)
+ LOCAL_MODULE := libclangARCMigrate
+ LOCAL_MODULE_TAGS := optional
+ 
++LOCAL_CFLAGS := -fno-strict-aliasing $(call-cc-option,-Qunused-arguments)
++
+ include $(CLANG_HOST_BUILD_MK)
+ include $(CLANG_TBLGEN_RULES_MK)
+ include $(BUILD_HOST_STATIC_LIBRARY)
+diff --git a/lib/AST/Android.mk b/lib/AST/Android.mk
+index bd719c8..f6b4271 100644
+--- a/lib/AST/Android.mk
++++ b/lib/AST/Android.mk
+@@ -87,6 +87,8 @@ LOCAL_MODULE_TAGS := optional
+ 
+ LOCAL_MODULE_TAGS := optional
+ 
++LOCAL_CFLAGS := -fno-strict-aliasing $(call-cc-option,-Qunused-arguments)
++
+ include $(CLANG_HOST_BUILD_MK)
+ include $(CLANG_TBLGEN_RULES_MK)
+ include $(BUILD_HOST_STATIC_LIBRARY)
+diff --git a/lib/Analysis/Android.mk b/lib/Analysis/Android.mk
+index 7d2d1f9..5060977 100644
+--- a/lib/Analysis/Android.mk
++++ b/lib/Analysis/Android.mk
+@@ -44,6 +44,8 @@ LOCAL_MODULE_TAGS := optional
+ 
+ LOCAL_MODULE_TAGS := optional
+ 
++LOCAL_CFLAGS := -fno-strict-aliasing $(call-cc-cpp-option,-Qunused-arguments)
++
+ include $(CLANG_HOST_BUILD_MK)
+ include $(CLANG_TBLGEN_RULES_MK)
+ include $(BUILD_HOST_STATIC_LIBRARY)
+diff --git a/lib/Basic/Android.mk b/lib/Basic/Android.mk
+index b8d8a11..bb3e579 100644
+--- a/lib/Basic/Android.mk
++++ b/lib/Basic/Android.mk
+@@ -47,6 +47,8 @@ LOCAL_MODULE_TAGS := optional
+ 
+ LOCAL_MODULE_TAGS := optional
+ 
++LOCAL_CFLAGS := -fno-strict-aliasing $(call-cc-option,-Qunused-arguments)
++
+ include $(CLANG_HOST_BUILD_MK)
+ include $(CLANG_VERSION_INC_MK)
+ include $(CLANG_TBLGEN_RULES_MK)
+diff --git a/lib/CodeGen/Android.mk b/lib/CodeGen/Android.mk
+index dc11b8b..22289d0 100644
+--- a/lib/CodeGen/Android.mk
++++ b/lib/CodeGen/Android.mk
+@@ -64,6 +64,8 @@ LOCAL_MODULE_TAGS := optional
+ LOCAL_SRC_FILES := $(clang_codegen_SRC_FILES)
+ TBLGEN_TABLES := $(clang_codegen_TBLGEN_TABLES)
+ 
++LOCAL_CFLAGS := -fno-strict-aliasing $(call-cc-option,-Qunused-arguments)
++
+ include $(CLANG_HOST_BUILD_MK)
+ include $(CLANG_VERSION_INC_MK)
+ include $(CLANG_TBLGEN_RULES_MK)
+diff --git a/lib/Driver/Android.mk b/lib/Driver/Android.mk
+index 7a3ec43..b030021 100644
+--- a/lib/Driver/Android.mk
++++ b/lib/Driver/Android.mk
+@@ -38,6 +38,8 @@ LOCAL_MODULE_TAGS := optional
+ 
+ LOCAL_MODULE_TAGS := optional
+ 
++LOCAL_CFLAGS := -fno-strict-aliasing $(call-cc-option,-Qunused-arguments)
++
+ include $(CLANG_HOST_BUILD_MK)
+ include $(CLANG_TBLGEN_RULES_MK)
+ include $(CLANG_VERSION_INC_MK)
+diff --git a/lib/Edit/Android.mk b/lib/Edit/Android.mk
+index 87f4e25..79b72ba 100644
+--- a/lib/Edit/Android.mk
++++ b/lib/Edit/Android.mk
+@@ -26,6 +26,8 @@ LOCAL_MODULE:= libclangEdit
+ 
+ LOCAL_MODULE_TAGS := optional
+ 
++LOCAL_CFLAGS := -fno-strict-aliasing $(call-cc-option,-Qunused-arguments)
++
+ include $(CLANG_HOST_BUILD_MK)
+ include $(CLANG_VERSION_INC_MK)
+ include $(CLANG_TBLGEN_RULES_MK)
+diff --git a/lib/Frontend/Android.mk b/lib/Frontend/Android.mk
+index 0839dec..4cd7eed 100644
+--- a/lib/Frontend/Android.mk
++++ b/lib/Frontend/Android.mk
+@@ -59,6 +59,8 @@ LOCAL_MODULE_TAGS:= optional
+ 
+ LOCAL_MODULE_TAGS := optional
+ 
++LOCAL_CFLAGS := -fno-strict-aliasing $(call-cc-option,-Qunused-arguments)
++
+ include $(CLANG_HOST_BUILD_MK)
+ include $(CLANG_TBLGEN_RULES_MK)
+ include $(CLANG_VERSION_INC_MK)
+diff --git a/lib/FrontendTool/Android.mk b/lib/FrontendTool/Android.mk
+index 2496f6b..352cdcc 100644
+--- a/lib/FrontendTool/Android.mk
++++ b/lib/FrontendTool/Android.mk
+@@ -19,6 +19,8 @@ clang_frontend_tool_SRC_FILES := \
+ 
+ LOCAL_SRC_FILES := $(clang_frontend_tool_SRC_FILES)
+ 
++LOCAL_CFLAGS := -fno-strict-aliasing $(call-cc-option,-Qunused-arguments)
++
+ include $(CLANG_HOST_BUILD_MK)
+ include $(CLANG_TBLGEN_RULES_MK)
+ include $(BUILD_HOST_STATIC_LIBRARY)
+diff --git a/lib/Lex/Android.mk b/lib/Lex/Android.mk
+index f3e294f..dfe52f3 100644
+--- a/lib/Lex/Android.mk
++++ b/lib/Lex/Android.mk
+@@ -41,6 +41,8 @@ LOCAL_MODULE_TAGS := optional
+ 
+ LOCAL_MODULE_TAGS := optional
+ 
++LOCAL_CFLAGS := -fno-strict-aliasing $(call-cc-option,-Qunused-arguments)
++
+ include $(CLANG_HOST_BUILD_MK)
+ include $(CLANG_TBLGEN_RULES_MK)
+ include $(BUILD_HOST_STATIC_LIBRARY)
+diff --git a/lib/Parse/Android.mk b/lib/Parse/Android.mk
+index 0bd3c20..372912d 100644
+--- a/lib/Parse/Android.mk
++++ b/lib/Parse/Android.mk
+@@ -40,6 +40,8 @@ LOCAL_MODULE_TAGS := optional
+ 
+ LOCAL_MODULE_TAGS := optional
+ 
++LOCAL_CFLAGS := -fno-strict-aliasing $(call-cc-option,-Qunused-arguments)
++
+ include $(CLANG_HOST_BUILD_MK)
+ include $(CLANG_TBLGEN_RULES_MK)
+ include $(BUILD_HOST_STATIC_LIBRARY)
+diff --git a/lib/Rewrite/Core/Android.mk b/lib/Rewrite/Core/Android.mk
+index 546fc04..86adaf6 100644
+--- a/lib/Rewrite/Core/Android.mk
++++ b/lib/Rewrite/Core/Android.mk
+@@ -28,6 +28,7 @@ clang_rewrite_core_SRC_FILES := \
+ 
+ LOCAL_SRC_FILES := $(clang_rewrite_core_SRC_FILES)
+ 
++LOCAL_CFLAGS := -fno-strict-aliasing $(call-cc-option,-Qunused-arguments)
+ 
+ include $(CLANG_HOST_BUILD_MK)
+ include $(CLANG_TBLGEN_RULES_MK)
+diff --git a/lib/Rewrite/Frontend/Android.mk b/lib/Rewrite/Frontend/Android.mk
+index 2bbf311..c34a650 100644
+--- a/lib/Rewrite/Frontend/Android.mk
++++ b/lib/Rewrite/Frontend/Android.mk
+@@ -32,6 +32,7 @@ clang_rewrite_frontend_SRC_FILES := \
+ 
+ LOCAL_SRC_FILES := $(clang_rewrite_frontend_SRC_FILES)
+ 
++LOCAL_CFLAGS := -fno-strict-aliasing $(call-cc-option,-Qunused-arguments)
+ 
+ include $(CLANG_HOST_BUILD_MK)
+ include $(CLANG_TBLGEN_RULES_MK)
+diff --git a/lib/Sema/Android.mk b/lib/Sema/Android.mk
+index 457921f..d81dcbc 100644
+--- a/lib/Sema/Android.mk
++++ b/lib/Sema/Android.mk
+@@ -76,6 +76,8 @@ LOCAL_MODULE_TAGS := optional
+ 
+ LOCAL_MODULE_TAGS := optional
+ 
++LOCAL_CFLAGS := -fno-strict-aliasing $(call-cc-option,-Qunused-arguments)
++
+ include $(CLANG_HOST_BUILD_MK)
+ include $(CLANG_TBLGEN_RULES_MK)
+ include $(BUILD_HOST_STATIC_LIBRARY)
+diff --git a/lib/Serialization/Android.mk b/lib/Serialization/Android.mk
+index 751e306..746c5c9 100644
+--- a/lib/Serialization/Android.mk
++++ b/lib/Serialization/Android.mk
+@@ -39,6 +39,7 @@ clang_serialization_SRC_FILES :=\
+ 
+ LOCAL_SRC_FILES := $(clang_serialization_SRC_FILES)
+ 
++LOCAL_CFLAGS := -fno-strict-aliasing $(call-cc-option,-Qunused-arguments)
+ 
+ include $(CLANG_HOST_BUILD_MK)
+ include $(CLANG_TBLGEN_RULES_MK)
+diff --git a/lib/StaticAnalyzer/Checkers/Android.mk b/lib/StaticAnalyzer/Checkers/Android.mk
+index 343dfe3..2df379f 100644
+--- a/lib/StaticAnalyzer/Checkers/Android.mk
++++ b/lib/StaticAnalyzer/Checkers/Android.mk
+@@ -93,6 +93,8 @@ LOCAL_MODULE:= libclangStaticAnalyzerCheckers
+ 
+ LOCAL_MODULE_TAGS := optional
+ 
++LOCAL_CFLAGS := -fno-strict-aliasing $(call-cc-option,-Qunused-arguments)
++
+ include $(CLANG_HOST_BUILD_MK)
+ include $(CLANG_TBLGEN_RULES_MK)
+ include $(CLANG_VERSION_INC_MK)
+diff --git a/lib/StaticAnalyzer/Core/Android.mk b/lib/StaticAnalyzer/Core/Android.mk
+index 324cbc9..acf8c08 100644
+--- a/lib/StaticAnalyzer/Core/Android.mk
++++ b/lib/StaticAnalyzer/Core/Android.mk
+@@ -62,6 +62,8 @@ LOCAL_MODULE:= libclangStaticAnalyzerCore
+ 
+ LOCAL_MODULE_TAGS := optional
+ 
++LOCAL_CFLAGS := -fno-strict-aliasing $(call-cc-option,-Qunused-arguments)
++
+ include $(CLANG_HOST_BUILD_MK)
+ include $(CLANG_TBLGEN_RULES_MK)
+ include $(CLANG_VERSION_INC_MK)
+diff --git a/lib/StaticAnalyzer/Frontend/Android.mk b/lib/StaticAnalyzer/Frontend/Android.mk
+index 031c330..9c63a06 100644
+--- a/lib/StaticAnalyzer/Frontend/Android.mk
++++ b/lib/StaticAnalyzer/Frontend/Android.mk
+@@ -33,6 +33,8 @@ LOCAL_MODULE:= libclangStaticAnalyzerFrontend
+ 
+ LOCAL_MODULE_TAGS := optional
+ 
++LOCAL_CFLAGS := -fno-strict-aliasing $(call-cc-option,-Qunused-arguments)
++
+ include $(CLANG_HOST_BUILD_MK)
+ include $(CLANG_TBLGEN_RULES_MK)
+ include $(CLANG_VERSION_INC_MK)
+diff --git a/tools/driver/Android.mk b/tools/driver/Android.mk
+index e78273b..fd3c969 100644
+--- a/tools/driver/Android.mk
++++ b/tools/driver/Android.mk
+@@ -85,6 +85,8 @@ LOCAL_STATIC_LIBRARIES := \
+ 
+ LOCAL_LDLIBS += -lpthread -lm -ldl
+ 
++LOCAL_CFLAGS := -fno-strict-aliasing $(call-cc-option,-Qunused-arguments)
++
+ include $(CLANG_HOST_BUILD_MK)
+ include $(CLANG_TBLGEN_RULES_MK)
+ include $(BUILD_HOST_EXECUTABLE)
+diff --git a/utils/TableGen/Android.mk b/utils/TableGen/Android.mk
+index ae76bd1..de8ea4d 100644
+--- a/utils/TableGen/Android.mk
++++ b/utils/TableGen/Android.mk
+@@ -18,6 +18,8 @@ LOCAL_MODULE := clang-tblgen
+ LOCAL_MODULE_TAGS := optional
+ LOCAL_SRC_FILES := $(clang_tablegen_SRC_FILES)
+ 
++LOCAL_CFLAGS := -fno-strict-aliasing $(call-cc-cpp-option,-Qunused-arguments)
++
+ REQUIRES_EH := 1
+ REQUIRES_RTTI := 1
+ 
+-- 
+1.8.1.6
+
