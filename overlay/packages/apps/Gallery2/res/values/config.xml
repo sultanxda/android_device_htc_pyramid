@@ -17,6 +17,13 @@
 <!-- Camera app resources that may need to be customized
      for different hardware or product builds. -->
 <resources>
-    <!-- Disable if your camera HAL does not support snapshots while recording video -->
+    <!-- Disable if your camera sensor does not support snapshots while recording video -->
     <bool name="isVideoSnapshotSupported">false</bool>
+
+    <!-- The camera removes the focus modes by default when touch-to-focus
+         exists. Use this option to change that behavior -->
+    <bool name="wantsFocusModes">true</bool>
+
+    <!-- Maximum recording length in milliseconds. 0 means unlimited. -->
+    <integer name="max_video_recording_length">0</integer>
 </resources>

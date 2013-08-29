@@ -17,6 +17,6 @@
 <!-- Camera app resources that may need to be customized
      for different hardware or product builds. -->
 <resources>
-    <!-- Disable if your camera HAL does not support snapshots while recording video -->
+    <!-- Disable if your camera sensor does not support snapshots while recording video -->
     <bool name="isVideoSnapshotSupported">false</bool>
 </resources>
