@@ -20,6 +20,9 @@
     <!-- Disable if your camera sensor does not support snapshots while recording video -->
     <bool name="isVideoSnapshotSupported">false</bool>
 
+    <!-- HTC Camcorder Mode -->
+    <bool name="needsHTCCamMode">true</bool>
+
     <!-- The camera removes the focus modes by default when touch-to-focus
          exists. Use this option to change that behavior -->
     <bool name="wantsFocusModes">true</bool>
