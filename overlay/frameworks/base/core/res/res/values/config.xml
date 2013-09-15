@@ -197,5 +197,8 @@
     <string-array translatable="false" name="config_tether_bluetooth_regexs">
         <item>"bt-pan"</item>
     </string-array>
- 
+
+    <!-- Enable variable brightness for capacitive buttons -->
+    <bool name="config_deviceHasVariableButtonBrightness">true</bool> 
+
 </resources>
