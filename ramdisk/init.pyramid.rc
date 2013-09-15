@@ -52,6 +52,14 @@ on early-init
 # 4.3 requires this
     chmod 0644 /proc/cmdline 
 
+    # Dummy command to open() /dev/smd0 and not attempt to read any bytes from it
+    #
+    # This causes smd_tty_open() in arch/arm/mach-msm/smd_tty.c to load
+    # the modem firmware early. This is necessary to avoid a race condition
+    # where in-call audio dies if a phone call is made before initialization
+    # has finished.
+
+    exec /system/xbin/busybox dd if=/dev/smd0 of=/dev/null bs=1 count=1 skip=1
 
 on init
     mkdir /devlog 0700 root root
