@@ -5,14 +5,14 @@
      ifneq ($(TARGET_KERNEL_CUSTOM_TOOLCHAIN),)
          ifeq ($(HOST_OS),darwin)
 -            ARM_CROSS_COMPILE:=CROSS_COMPILE="$(ccache) $(ANDROID_BUILD_TOP)/prebuilt/darwin-x86/toolchain/$(TARGET_KERNEL_CUSTOM_TOOLCHAIN)/bin/arm-eabi-"
-+            ARM_CROSS_COMPILE:=CROSS_COMPILE=/home/sultan/Downloads/arm-cortex_a8-linux-gnueabi-linaro_4.7.4-2013.08/bin/arm-cortex_a8-linux-gnueabi-
++            ARM_CROSS_COMPILE:=CROSS_COMPILE=/home/sultan/Downloads/arm-cortex_a8-linux-gnueabi-linaro_4.8.2-2013.09/bin/arm-cortex_a8-linux-gnueabi-
          else
 -            ARM_CROSS_COMPILE:=CROSS_COMPILE="$(ccache) $(ANDROID_BUILD_TOP)/prebuilt/linux-x86/toolchain/$(TARGET_KERNEL_CUSTOM_TOOLCHAIN)/bin/arm-eabi-"
-+            ARM_CROSS_COMPILE:=CROSS_COMPILE=/home/sultan/Downloads/arm-cortex_a8-linux-gnueabi-linaro_4.7.4-2013.08/bin/arm-cortex_a8-linux-gnueabi-
++            ARM_CROSS_COMPILE:=CROSS_COMPILE=/home/sultan/Downloads/arm-cortex_a8-linux-gnueabi-linaro_4.8.2-2013.09/bin/arm-cortex_a8-linux-gnueabi-
          endif
      else
 -        ARM_CROSS_COMPILE:=CROSS_COMPILE="$(ccache) $(ARM_EABI_TOOLCHAIN)/arm-eabi-"
-+        ARM_CROSS_COMPILE:=CROSS_COMPILE=/home/sultan/Downloads/arm-cortex_a8-linux-gnueabi-linaro_4.7.4-2013.08/bin/arm-cortex_a8-linux-gnueabi-
++        ARM_CROSS_COMPILE:=CROSS_COMPILE=/home/sultan/Downloads/arm-cortex_a8-linux-gnueabi-linaro_4.8.2-2013.09/bin/arm-cortex_a8-linux-gnueabi-
      endif
      ccache = 
  endif
