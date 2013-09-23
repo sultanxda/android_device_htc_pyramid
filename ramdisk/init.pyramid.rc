@@ -129,12 +129,6 @@ on boot
     write /sys/module/lowmemorykiller/parameters/minfree 10342,13025,15708,18585,38400,46080
     chmod 0444 /sys/module/lowmemorykiller/parameters/minfree
 
-    # Enable KSM
-    chown system system /sys/kernel/mm/ksm/run
-    chmod 0666 /sys/kernel/mm/ksm/run
-    write /sys/kernel/mm/ksm/run 1
-    chmod 0444 /sys/kernel/mm/ksm/run
-
     # audio
     mkdir /data/audio 2770 media audio
 
