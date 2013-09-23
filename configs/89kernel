@@ -5,46 +5,45 @@
 
 # Configure your options here #
 
+# UKSM (Ultra KSM)
+# It is recommended to enable this for better performance
+# 0 = disabled
+# 1 = enabled
+UKSM=1
 
-# Config default CPU Gonvernor (Disabled by default: When disabled uses internal Kernel setting)
-# For better battery life switch to badass
-# Kernel Default: ondemand
-# Possible values
-#  badass
-#  ondemand
-#  interactive
-#  lagfee
-#  performance
+# Kernel Default: Ondemand
+# Available options:
+# Badass
+# Ondemand
+# Interactive
+# Lagfee
+# Performance
 GOV=ondemand
 
 
 # Config I/O scheduler
-# deadline (default)
-# cfq
-# noop
-# bfq
-# vr 
-# sio
+# Deadline (default)
+# CFQ
+# Noop
+# BFQ
+# V(R) 
+# SIO
 IO=deadline
 
 
 # Config CPU max frequency
-# Default: 1566000 (1566MHz)
-# Overclockable to - 1836000 (1836MHz)
-# for badass set to 1566mhtz (best performance/battery life)
 MAXFREQ=1512000
 
 
 # Config CPU min frequency
-# Default: 384000 (384MHz)
-# Range 384000 - 1944000 (384MHz - 1944MHz)
+# This should stay at 384MHz
 MINFREQ=384000
 
 
 # Config 3D GPU clock
 # 228571000 = 228MHz
 # 266667000 = 267MHz (default)
-# 300000000 = 300MHz (Recomended For balance of Performance and Battery life)
+# 300000000 = 300MHz
 # 320000000 = 320MHz
 GPU=266667000
 
@@ -53,13 +52,12 @@ GPU=266667000
 # 145455000 = 145MHz
 # 160000000 = 160MHz
 # 200000000 = 200MHz (default)
-# 228571000 = 228MHz (Recomended For balance of Performance and Battery life)
+# 228571000 = 228MHz
 # 266667000 = 267MHz
 DD=200000000
 
 
-# Badass
-# possible values
+# Badass Configuration
 # 1 = performance
 # 2 = balanced
 # 3 = battery saving
@@ -81,7 +79,7 @@ FASTCHARGE=0
 
 
 # Fsync Control
-# 2 = Fsync disabled
+# 0 = Fsync disabled
 # 1 = Fsync enabled
 FSYNC=1
 
@@ -149,7 +147,7 @@ echo badass > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
 sleep 3
 case ${BADASS} in
 	1)
-		$L "badass: setting performance oriented configuration"
+		$L "badass: setting performance-oriented configuration"
 		echo 1188000 > /sys/devices/system/cpu/cpufreq/badass/two_phase_freq;
 		echo 1512000 > /sys/devices/system/cpu/cpufreq/badass/three_phase_freq;
 		echo 120 > /sys/devices/system/cpu/cpufreq/badass/busy_threshold;
@@ -182,14 +180,14 @@ echo ${CUR_GOV} > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
 
 # Config CPU Frequency
     chmod 644 /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
-    echo $MAXFREQ > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+    echo "$MAXFREQ" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
     chmod 644 /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
-    echo $MINFREQ > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
+    echo "$MINFREQ" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
  
     chmod 644 /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq
-    echo $MAXFREQ > /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq
+    echo "$MAXFREQ" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq
     chmod 644 /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq
-    echo $MINFREQ > /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq
+    echo "$MINFREQ" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq
 
 
 # Config I/O scheduler
@@ -200,7 +198,7 @@ echo ${CUR_GOV} > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
 
 
 # Config Fsync
-if [ "$FSYNC" = "2" ]
-then
-    echo "0" > sys/class/misc/fsynccontrol/fsync_enabled
-fi
+    echo "$FSYNC" > /sys/class/misc/fsynccontrol/fsync_enabled
+
+# Config UKSM
+echo "$UKSM" > /sys/kernel/mm/uksm/run
