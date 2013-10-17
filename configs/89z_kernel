@@ -1,0 +1,154 @@
+#!/system/bin/sh
+# ==============================
+#  BASIC AIO kernel MOD
+# ==============================
+#  Script base created by IBA21
+# ==============================
+#  Then modified by axetilen
+# ==============================
+#  Finally modified by android1234567
+# ==============================
+#### Change your own settings here!!!
+
+# Config 2D GPU clock
+# 145455000 = 145mhz
+# 160000000 = 160mhz
+# 200000000 = 200mhz
+# 228571000 = 228mhz (229mhz)
+# 266667000 = 267mhz
+DD=200000000;
+
+# Config 3D GPU clock
+# 228571000 = 228mhz
+# 266667000 = 267mhz
+# 300000000 = 300mhz
+# 320000000 = 320mhz
+GPU=266667000;
+
+# Config I/O scheduler
+# deadline
+# cfq
+# noop
+# sio
+# vr
+# bfq
+IO=sio;
+
+# Enable Sweep2Wake
+# 0 = disabled
+# 1 = enabled
+# 2 = enabled (with no button backlight)
+SWEEP=0;
+
+# Enable Fastcharge
+# 0 = disabled
+# 1 = substitute AC to USB charging always
+# 2 = substitute AC to USB charging only if there is no USB peripheral detected
+FASTCHARGE=1;
+
+## Config CPU Frequency
+# Config CPU max frequency
+MAXFREQ=1566000;
+
+# Notification LED Duration Mod (Yank555)
+# 0 = Will blink forever until cleared by user
+# 1 = Will blink as requested by app or until cleared by user
+# 2 = Will blink TWICE as requested by app multiplied by value or until cleared by user
+# 5 = Will blink 5 TIMES as requested by app multiplied by value or until cleared by user
+# 10 = Will blink 10 TIMES as requested by app or until cleared by user
+# 60 = Will blink 60 TIMES as requested by app or until cleared by user
+# 255 = Will blink 255 TIMES as requested by app multiplied by value or until cleared by user
+LED=0;
+
+# Config CPU governor
+# badass
+# intellidemand
+# ondemand
+# lagfree
+# performance
+# interactive
+GOV=ondemand;
+
+# Mpdecision (Show-p1984)
+# 1 = enabled
+# 0 = disable mpdecision and force both CPU cores online
+MSM=1;
+
+####### This is the end of the area that you can configure #######
+
+
+### Forbidden area - PlEASE DO NOT CHANGE ANYTHING BELOW THIS LINE ###
+
+## Config CPU governor
+	echo "$GOV" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+	echo "$GOV" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
+
+# Config CPU Frequency
+    chmod 644 /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+    echo $MAXFREQ > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+
+    chmod 644 /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq
+    echo $MAXFREQ > /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq
+
+# Config 3D GPU setting
+    chmod 644 /sys/devices/platform/kgsl-3d0.0/kgsl/kgsl-3d0/max_gpuclk
+    echo $GPU > /sys/devices/platform/kgsl-3d0.0/kgsl/kgsl-3d0/max_gpuclk
+
+# Config 2D GPU setting
+    chmod 644 /sys/devices/platform/kgsl-2d0.0/kgsl/kgsl-2d0/max_gpuclk
+    chmod 644 /sys/devices/platform/kgsl-2d0.0/kgsl/kgsl-2d0/gpuclk
+    chmod 644 /sys/devices/platform/kgsl-2d1.1/kgsl/kgsl-2d1/max_gpuclk
+    chmod 644 /sys/devices/platform/kgsl-2d1.1/kgsl/kgsl-2d1/gpuclk
+    echo $DD > /sys/devices/platform/kgsl-2d0.0/kgsl/kgsl-2d0/max_gpuclk
+    echo $DD > /sys/devices/platform/kgsl-2d0.0/kgsl/kgsl-2d0/gpuclk
+    echo $DD > /sys/devices/platform/kgsl-2d1.1/kgsl/kgsl-2d1/max_gpuclk
+    echo $DD > /sys/devices/platform/kgsl-2d1.1/kgsl/kgsl-2d1/gpuclk
+
+# Config Sweep2Wake
+    chmod 644 /sys/android_touch/sweep2wake
+    echo "$SWEEP" > /sys/android_touch/sweep2wake
+
+# Config Notification LED Time-out
+	  chmod 644 sys/kernel/notification_leds/off_timer_multiplier
+	  echo "$LED" > /sys/kernel/notification_leds/off_timer_multiplier
+
+	  chmod 644 /sys/kernel/fast_charge/force_fast_charge
+	  echo "$FASTCHARGE" > /sys/kernel/fast_charge/force_fast_charge
+
+	  chmod 644 sys/kernel/notification_leds/off_timer_multiplier
+	  echo "$LED" > /sys/kernel/notification_leds/off_timer_multiplier
+
+# Config autosmp
+	if [ "$MSM" = "1" ]
+	then
+		chmod 644 /sys/module/autosmp/parameters/enabled
+		echo "Y" > /sys/module/autosmp/parameters/enabled
+		chmod 444 /sys/module/autosmp/parameters/enabled
+		chmod 777 /sys/devices/system/cpu/cpu1/online
+	fi
+
+	if [ "$MSM" = "0" ]
+	then
+		chmod 644 /sys/module/autosmp/parameters/enabled
+		echo "N" > /sys/module/autosmp/parameters/enabled
+		chmod 444 /sys/module/autosmp/parameters/enabled
+		chmod 777 /sys/devices/system/cpu/cpu1/online
+		echo "1" > /sys/devices/system/cpu/cpu1/online
+		chmod 444 /sys/devices/system/cpu/cpu1/online
+	fi
+
+		chmod 777 /system/bin/mpdecision
+		rm -f /system/bin/mpdecision
+		chmod 777 /system/bin/thermald
+		rm -f /system/bin/thermald
+		chmod 777 /system/etc/thermald.conf
+		rm -f /system/etc/thermald.conf
+		chmod 777 /system/etc/init.post_boot.sh
+		rm -f /system/etc/init.post_boot.sh
+		chmod 777 /system/etc/init.qcom.post_boot.sh
+		rm -f /system/etc/init.qcom.post_boot.sh
+# Config I/O scheduler
+    chmod 644 /sys/block/mmcblk0/queue/scheduler
+    echo "$IO" > /sys/block/mmcblk0/queue/scheduler
+    chmod 644 /sys/block/mmcblk1/queue/scheduler
+    echo "$IO" > /sys/block/mmcblk1/queue/scheduler
