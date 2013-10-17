@@ -49,7 +49,8 @@ on early-init
 
     # Force loading of modem and Q6 images
     write /dev/smd_pkt_loopback 1
-# 4.3 requires this
+
+    # 4.3 requires this
     chmod 0644 /proc/cmdline 
 
     # Dummy command to open() /dev/smd0 and not attempt to read any bytes from it
@@ -91,9 +92,6 @@ on post-fs-data
     setprop vold.post_fs_data_done 1
 
 on boot
-    # for systrace
-    mount debugfs /sys/kernel/debug /sys/kernel/debug
-
     # Chown polling nodes as needed from UI running on system server
     chmod 0664 /sys/devices/platform/msm_sdcc.1/polling
     chmod 0664 /sys/devices/platform/msm_sdcc.2/polling
@@ -144,7 +142,7 @@ on boot
     chown system system /sys/class/leds/lcd-backlight/brightness
 
     # Kernel init script - kernel config
-    chmod 0777          /system/etc/init.d/89kernel
+    chmod 0777          /system/etc/init.d/89z_kernel
 
     # for optical sensors
     chown system system /sys/class/optical_sensors/lightsensor/ls_adc
@@ -170,17 +168,6 @@ on boot
     chown radio radio /sys/class/htc_accelerometer/accelerometer/PhoneOnOffFlag
     chown radio radio /sys/class/htc_ecompass/ecompass/PhoneOnOffFlag
 
-    # remove write permissions to video nodes
-    chmod 0664 /sys/devices/virtual/graphics/fb1/hpd
-    chmod 0664 /sys/devices/virtual/graphics/fb1/video_mode
-    chmod 0664 /sys/devices/virtual/graphics/fb1/format_3d
-
-    # change owner and group for media server and surfaceflinger
-    chown system system /sys/devices/virtual/graphics/fb1/format_3d
-
-    chown system system /sys/devices/platform/panel_3d/3D_mode
-    chmod 0664 /sys/devices/platform/panel_3d/3D_mode
-
     #Vibrator
     chown system system sys/devices/platform/msm_ssbi.0/pm8058-core/pm8xxx-vib/amp
     chmod 666 sys/devices/platform/msm_ssbi.0/pm8058-core/pm8xxx-vib/amp
@@ -199,10 +186,10 @@ on boot
     chmod 0666 /sys/class/leds/flashlight/brightness
 
     # fix Camera crashing phone when taking photo with flash
+    chown system camera /sys/class/leds/flashlight/max_brightness
     chmod 0666 /sys/class/leds/flashlight/max_brightness
     write /sys/class/leds/flashlight/max_brightness 3
     chmod 0444 /sys/class/leds/flashlight/max_brightness
-    chown system camera /sys/class/leds/flashlight/max_brightness
 
     # sync fs
     chown system /sys/devices/platform/rs300000a7.65536/force_sync
