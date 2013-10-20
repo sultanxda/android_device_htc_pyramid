@@ -8,4 +8,6 @@ cd $HOME/cm10.2/packages/apps/Phone
 git reset --hard && git clean -f -d
 cd $HOME/cm10.2/frameworks/opt/telephony
 git reset --hard && git clean -f -d
+cd $HOME/cm10.2/packages/apps/Torch
+git reset --hard && git clean -f -d
 cd $HOME/cm10.2
