@@ -52,6 +52,7 @@ BOARD_USES_LEGACY_RIL := true
 
 # Recovery
 TARGET_RECOVERY_FSTAB = device/htc/pyramid/ramdisk/fstab.pyramid
+TARGET_RECOVERY_PIXEL_FORMAT := "BGRA_8888"
 RECOVERY_FSTAB_VERSION := 2
 
 # Filesystem
