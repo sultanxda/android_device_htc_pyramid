@@ -1,10 +1,13 @@
 import init.pyramid.usb.rc
 
-on early-init
-    mkdir /storage 0050 root sdcard_r
-    mkdir /storage/usbdisk 0000 system system
-    mkdir /storage/sdcard0 0000 system system
-    
+on init
+
+    mkdir /mnt/media_rw/sdcard0 0700 media_rw media_rw
+    mkdir /mnt/media_rw/usbdisk 0700 media_rw media_rw
+
+    mkdir /storage/sdcard0 0700 root root
+    mkdir /storage/usbdisk 0700 root root
+
     # for backwards compatibility
     symlink /storage/sdcard0 /sdcard
     symlink /storage/sdcard0 /mnt/sdcard
@@ -62,7 +65,6 @@ on early-init
 
     exec /system/xbin/busybox dd if=/dev/smd0 of=/dev/null bs=1 count=1 skip=1
 
-on init
     mkdir /devlog 0700 root root
 
 on fs
@@ -118,8 +120,8 @@ on boot
     mkdir /data/misc 1771 system misc
     mkdir /data/misc/wifi 0770 wifi wifi
     mkdir /data/misc/wifi/sockets 0770 wifi wifi
+    mkdir /data/misc/wifi/wpa_supplicant 0770 wifi wifi
     mkdir /data/misc/dhcp 0770 dhcp dhcp
-    chown dhcp dhcp /data/misc/dhcp
 
     # Make OOM settings stricter
     chown system system /sys/module/lowmemorykiller/parameters/minfree
@@ -197,7 +199,7 @@ on boot
 
 # Services start here
 
-service dhcpcd_wlan0 /system/bin/dhcpcd -ABKL
+service dhcpcd_wlan0 /system/bin/dhcpcd -aABDKL
     class main
     disabled
     oneshot
@@ -228,13 +230,6 @@ service iprenew_wlan0 /system/bin/dhcpcd -n
 service netmgrd /system/bin/netmgrd
     class main
 
-service p2p_supplicant /system/bin/wpa_supplicant -Dnl80211 -iwlan0 -c /data/misc/wifi/wpa_supplicant.conf
-    user root
-    group wifi inet
-    socket wpa_wlan0 dgram 0660 wifi wifi
-    disabled
-    oneshot
-
 service qcom-post-boot /system/bin/sh /system/etc/init.qcom.post_boot.sh
     class main
     user root
@@ -259,7 +254,11 @@ service rmt_storage /system/bin/rmt_storage /dev/block/mmcblk0p26 /dev/block/mmc
 #    group root
 #    disabled
 
-service wpa_supplicant /system/bin/wpa_supplicant -Dnl80211 -iwlan0 -c /data/misc/wifi/wpa_supplicant.conf
+service wpa_supplicant /system/bin/wpa_supplicant \
+    -iwlan0 -Dnl80211 -c/data/misc/wifi/wpa_supplicant.conf \
+    -I/system/etc/wifi/wpa_supplicant_overlay.conf \
+    -O/data/misc/wifi/sockets \
+    -e/data/misc/wifi/entropy.bin -g@android:wpa_wlan0
     user root
     group wifi inet
     class main
@@ -267,11 +266,19 @@ service wpa_supplicant /system/bin/wpa_supplicant -Dnl80211 -iwlan0 -c /data/mis
     disabled
     oneshot
 
+service sdcard /system/bin/sdcard /data/media 1023 1023
+    class late_start
+    disabled
+
+on property:persist.fuse_sdcard=true
+    start sdcard
+
+service fuse_sdcard0 /system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/sdcard0 /storage/sdcard0
+    class late_start
+    disabled
+
 on property:init.svc.bootanim=stopped
     start qcom-post-boot
-
-on property:ro.hdmi.enable=true
-    start hdmid
 
 on property:service.adb.root=1
     write /sys/class/android_usb/android0/enable 0
