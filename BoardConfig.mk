@@ -29,7 +29,7 @@ TARGET_BOOTLOADER_BOARD_NAME := pyramid
 # Kernel [Settings]
 BOARD_KERNEL_BASE := 0x48000000
 BOARD_KERNEL_PAGE_SIZE := 2048
-BOARD_KERNEL_CMDLINE := console=ttyHSL0 androidboot.hardware=pyramid no_console_suspend=1 androidboot.selinux=permissive
+BOARD_KERNEL_CMDLINE := console=ttyHSL0 androidboot.hardware=pyramid no_console_suspend=1
 
 # Kernel [Build]
 TARGET_KERNEL_CONFIG := sultan_defconfig
