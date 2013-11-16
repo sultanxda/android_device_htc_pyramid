@@ -16,3 +16,4 @@
 
 PRODUCT_MAKEFILES := \
     $(LOCAL_DIR)/device_pyramid.mk
+    $(LOCAL_DIR)/omni_pyramid.mk
