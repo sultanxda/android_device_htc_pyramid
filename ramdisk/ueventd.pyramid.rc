@@ -8,10 +8,10 @@
 /dev/kgsl-2d1           0666    root        root
 /dev/genlock            0666    root        root
 
-/dev/ion                0664    system      system
+/dev/ion                0664    media      system
 
 /dev/msm_rotator        0660    system      graphics
-/dev/pmem               0660    system      graphics
+/dev/pmem               0666    media       system
 
 # camera
 /dev/gemini0            0660    system      camera
