@@ -1,16 +1,16 @@
 # Android fstab file.
-#<src>                                          <mnt_point>         <type>   <mnt_flags>                                             <fs_mgr_flags>
+#<mnt_point>                                          <type>         <src>   <mnt_flags>                                             <fs_mgr_flags>
 
-/dev/block/mmcblk0p20                            /boot              emmc     defaults                                                defaults
-/dev/block/mmcblk0p21                            /recovery          emmc     defaults                                                defaults
-/dev/block/mmcblk0p22                            /system            ext4     ro,data=ordered,noauto_da_alloc                         wait
-/dev/block/mmcblk0p23                            /data              ext4     noatime,nosuid,nodev,data=ordered,noauto_da_alloc       wait
-/dev/block/mmcblk0p24                            /cache             ext4     noatime,nosuid,nodev,data=ordered,noauto_da_alloc       wait
-/dev/block/mmcblk0p28                            /devlog            ext4     noatime,nosuid,nodev,data=ordered,noauto_da_alloc       wait
-/dev/block/mmcblk0p31                            /misc              emmc     defaults                                                defaults
+/boot              emmc    /dev/block/mmcblk0p20                             defaults                                                defaults
+/recovery          emmc    /dev/block/mmcblk0p21                             defaults                                                defaults
+/system            ext4    /dev/block/mmcblk0p22                             ro,data=ordered,noauto_da_alloc                         wait
+/data              ext4    /dev/block/mmcblk0p23                             noatime,nosuid,nodev,data=ordered,noauto_da_alloc       wait
+/cache             ext4    /dev/block/mmcblk0p24                             noatime,nosuid,nodev,data=ordered,noauto_da_alloc       wait
+/devlog            ext4    /dev/block/mmcblk0p28                             noatime,nosuid,nodev,data=ordered,noauto_da_alloc       wait
+/misc              emmc    /dev/block/mmcblk0p31                             defaults                                                defaults
 
 # SD Card
-/devices/platform/msm_sdcc.3/mmc_host/mmc1      auto    auto     defaults                                                voldmanaged=sdcard0:auto,noemulatedsd
+auto    auto   /devices/platform/msm_sdcc.3/mmc_host/mmc1        defaults                                                voldmanaged=sdcard0:auto,noemulatedsd
 
 # USB Disk
-/devices/platform/msm_hsusb.0/usb1              auto    auto     defaults                                                voldmanaged=usbdisk:auto 
+auto    auto   /devices/platform/msm_hsusb.0/usb1                defaults                                                voldmanaged=usbdisk:auto 
