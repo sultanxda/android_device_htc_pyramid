@@ -32,7 +32,7 @@ BOARD_KERNEL_PAGE_SIZE := 2048
 BOARD_KERNEL_CMDLINE := console=ttyHSL0 androidboot.hardware=pyramid no_console_suspend=1
 
 # Kernel [Build]
-TARGET_KERNEL_CONFIG := sultan_defconfig
+TARGET_KERNEL_CONFIG := sultan-normal_defconfig
 #TARGET_KERNEL_CUSTOM_TOOLCHAIN := linaro-arm-cortex-a8
 #TARGET_KERNEL_CUSTOM_TOOLCHAIN_SUFFIX := arm-cortex_a8-linux-gnueabi
 BUILD_KERNEL := true
