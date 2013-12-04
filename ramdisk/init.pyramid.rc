@@ -2,6 +2,7 @@ import init.pyramid.usb.rc
 
 on init
 
+    mkdir /mnt/media_rw 0770 media_rw media_rw
     mkdir /mnt/media_rw/sdcard0 0700 media_rw media_rw
     mkdir /mnt/media_rw/usbdisk 0700 media_rw media_rw
 
