@@ -11,7 +11,4 @@ patch -p1 < ../../../device/htc/pyramid/patches/frameworks-opt-telephony.patch
 cd ../../../packages/apps/Torch
 git reset --hard && git clean -f -d
 patch -p1 < ../../../device/htc/pyramid/patches/packages-apps-torch.patch
-cd ../../../packages/providers/MediaProvider
-git reset --hard && git clean -f -d
-patch -p1 < ../../../device/htc/pyramid/patches/mediaproviderfix.patch
 cd ../../../
