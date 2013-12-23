@@ -48,7 +48,7 @@ FASTCHARGE=1;
 
 ## Config CPU Frequency
 # Config CPU max frequency
-MAXFREQ=1566000;
+MAXFREQ=1404000;
 
 # Notification LED Duration Mod (Yank555)
 # 0 = Will blink forever until cleared by user
