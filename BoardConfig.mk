@@ -32,9 +32,7 @@ BOARD_KERNEL_PAGE_SIZE := 2048
 BOARD_KERNEL_CMDLINE := console=ttyHSL0 androidboot.hardware=pyramid no_console_suspend=1
 
 # Kernel [Build]
-TARGET_KERNEL_CONFIG := sultan-normal_defconfig
-#TARGET_KERNEL_CUSTOM_TOOLCHAIN := linaro-arm-cortex-a8
-#TARGET_KERNEL_CUSTOM_TOOLCHAIN_SUFFIX := arm-cortex_a8-linux-gnueabi
+TARGET_KERNEL_CONFIG := sultan_defconfig
 BUILD_KERNEL := true
 
 # Bluetooth/Wifi
@@ -43,13 +41,8 @@ BUILD_KERNEL := true
 # Qcom GPS
 BOARD_VENDOR_QCOM_GPS_LOC_API_HARDWARE := pyramid
 
-# FM Radio
-BOARD_HAVE_FM_RADIO := true
-BOARD_GLOBAL_CFLAGS += -DHAVE_FM_RADIO
-
 # RIL
 BOARD_USES_LEGACY_RIL := true
-
 
 # Filesystem
 TARGET_USERIMAGES_USE_EXT4 := true
