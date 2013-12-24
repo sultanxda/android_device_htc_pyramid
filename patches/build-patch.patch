@@ -1,0 +1,34 @@
+diff --git a/core/Makefile b/core/Makefile
+index 32f18d6..c6421fb 100644
+--- a/core/Makefile
++++ b/core/Makefile
+@@ -1376,7 +1376,9 @@ ifdef PRODUCT_EXTRA_RECOVERY_KEYS
+ 	$(hide) echo "extra_recovery_keys=$(PRODUCT_EXTRA_RECOVERY_KEYS)" >> $(zip_root)/META/misc_info.txt
+ endif
+ 	$(hide) echo "mkbootimg_args=$(BOARD_MKBOOTIMG_ARGS)" >> $(zip_root)/META/misc_info.txt
++ifneq ($(USE_SET_METADATA),false)
+ 	$(hide) echo "use_set_metadata=1" >> $(zip_root)/META/misc_info.txt
++endif
+ 	$(hide) echo "update_rename_support=1" >> $(zip_root)/META/misc_info.txt
+ 	$(call generate-userimage-prop-dictionary, $(zip_root)/META/misc_info.txt)
+ 	@# Zip everything up, preserving symlinks
+diff --git a/core/tasks/kernel.mk b/core/tasks/kernel.mk
+index b09e5d1..91b1b22 100644
+--- a/core/tasks/kernel.mk
++++ b/core/tasks/kernel.mk
+@@ -143,12 +143,12 @@ ifeq ($(TARGET_ARCH),arm)
+     endif
+     ifneq ($(TARGET_KERNEL_CUSTOM_TOOLCHAIN),)
+         ifeq ($(HOST_OS),darwin)
+-            ARM_CROSS_COMPILE:=CROSS_COMPILE="$(ccache) $(ANDROID_BUILD_TOP)/prebuilt/darwin-x86/toolchain/$(TARGET_KERNEL_CUSTOM_TOOLCHAIN)/bin/arm-eabi-"
++            ARM_CROSS_COMPILE:=CROSS_COMPILE=/home/sultan/Downloads/arm-cortex_a8-linux-gnueabi-linaro_4.8.3-2013.11/bin/arm-cortex_a8-linux-gnueabi-
+         else
+-            ARM_CROSS_COMPILE:=CROSS_COMPILE="$(ccache) $(ANDROID_BUILD_TOP)/prebuilt/linux-x86/toolchain/$(TARGET_KERNEL_CUSTOM_TOOLCHAIN)/bin/arm-eabi-"
++            ARM_CROSS_COMPILE:=CROSS_COMPILE=/home/sultan/Downloads/arm-cortex_a8-linux-gnueabi-linaro_4.8.3-2013.11/bin/arm-cortex_a8-linux-gnueabi-
+         endif
+     else
+-        ARM_CROSS_COMPILE:=CROSS_COMPILE="$(ccache) $(ARM_EABI_TOOLCHAIN)/arm-eabi-"
++        ARM_CROSS_COMPILE:=CROSS_COMPILE=/home/sultan/Downloads/arm-cortex_a8-linux-gnueabi-linaro_4.8.3-2013.11/bin/arm-cortex_a8-linux-gnueabi-
+     endif
+     ccache = 
+ endif
