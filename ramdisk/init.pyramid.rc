@@ -180,6 +180,9 @@ on boot
 
     # flashlight
     chown system camera /sys/class/leds/flashlight/brightness
+    
+    # Allow Phone to write to sweep2wake
+    chmod 0666 /sys/android_touch/sweep2wake
 
     # allow Torch to write to flashlight file
     chmod 0666 /sys/class/leds/flashlight/brightness
