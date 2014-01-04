@@ -62,7 +62,6 @@ on init
 
     exec /system/xbin/busybox dd if=/dev/smd0 of=/dev/null bs=1 count=1 skip=1
 
-on init
     mkdir /devlog 0700 root root
 
 on fs
