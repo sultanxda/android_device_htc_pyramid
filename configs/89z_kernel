@@ -6,26 +6,35 @@
 # ==============================
 #  Then modified by axetilen
 # ==============================
-#  Finally modified by android1234567
+#  Finally modified by Sultanxda
 # ==============================
-#### Change your own settings here!!!
 
-# Config 2D GPU clock
-# 145455000 = 145mhz
-# 160000000 = 160mhz
-# 200000000 = 200mhz
-# 228571000 = 228mhz (229mhz)
-# 266667000 = 267mhz
+### Change your own settings here ###
+
+## Config display undervolt
+# Choose a value between
+# 0mV and 700mV that is a
+# multiple of 25.
+# Undervolt will be
+# 3100mV MINUS [what you choose]
+PANEL_UV=250;
+
+## Config 2D GPU clock
+# 145455000 = 145MHz
+# 160000000 = 160MHz
+# 200000000 = 200MHz
+# 228571000 = 228MHz (229MHz)
+# 266667000 = 267MHz
 DD=200000000;
 
-# Config 3D GPU clock
-# 228571000 = 228mhz
-# 266667000 = 267mhz
-# 300000000 = 300mhz
-# 320000000 = 320mhz
+## Config 3D GPU clock
+# 228571000 = 228MHz
+# 266667000 = 267MHz
+# 300000000 = 300MHz
+# 320000000 = 320MHz
 GPU=266667000;
 
-# Config I/O scheduler
+## Config I/O scheduler
 # deadline
 # cfq
 # noop
@@ -34,13 +43,13 @@ GPU=266667000;
 # bfq
 IO=sio;
 
-# Enable Sweep2Wake
+## Enable Sweep2Wake
 # 0 = disabled
 # 1 = enabled
 # 2 = enabled (with no button backlight)
 SWEEP=0;
 
-# Enable Fastcharge
+## Enable Fastcharge
 # 0 = disabled
 # 1 = substitute AC to USB charging always
 # 2 = substitute AC to USB charging only if there is no USB peripheral detected
@@ -50,7 +59,7 @@ FASTCHARGE=1;
 # Config CPU max frequency
 MAXFREQ=1404000;
 
-# Notification LED Duration Mod (Yank555)
+## Notification LED Duration Mod (Yank555)
 # 0 = Will blink forever until cleared by user
 # 1 = Will blink as requested by app or until cleared by user
 # 2 = Will blink TWICE as requested by app multiplied by value or until cleared by user
@@ -60,7 +69,7 @@ MAXFREQ=1404000;
 # 255 = Will blink 255 TIMES as requested by app multiplied by value or until cleared by user
 LED=0;
 
-# Config CPU governor
+## Config CPU governor
 # badass
 # intellidemand
 # ondemand
@@ -69,19 +78,22 @@ LED=0;
 # interactive
 GOV=ondemand;
 
-# Mpdecision (Show-p1984)
+## Mpdecision (Show-p1984)
 # 1 = enabled
 # 0 = disable mpdecision and force both CPU cores online
 MSM=1;
 
-####### This is the end of the area that you can configure #######
+##### This is the end of the area that you can configure #####
 
 
-### Forbidden area - PlEASE DO NOT CHANGE ANYTHING BELOW THIS LINE ###
+### DO NOT CHANGE ANYTHING BELOW THIS LINE ###
 
-## Config CPU governor
-	echo "$GOV" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-	echo "$GOV" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
+# Config Display UV
+	echo "$PANEL_UV" > /sys/module/msm_mipi/parameters/panel_uv
+
+# Config CPU governor
+    echo "$GOV" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+    echo "$GOV" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
 
 # Config CPU Frequency
     chmod 644 /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
@@ -109,44 +121,41 @@ MSM=1;
     echo "$SWEEP" > /sys/android_touch/sweep2wake
 
 # Config Notification LED Time-out
-	  chmod 644 sys/kernel/notification_leds/off_timer_multiplier
-	  echo "$LED" > /sys/kernel/notification_leds/off_timer_multiplier
+    chmod 644 sys/kernel/notification_leds/off_timer_multiplier
+    echo "$LED" > /sys/kernel/notification_leds/off_timer_multiplier
 
-	  chmod 644 /sys/kernel/fast_charge/force_fast_charge
-	  echo "$FASTCHARGE" > /sys/kernel/fast_charge/force_fast_charge
+    chmod 644 /sys/kernel/fast_charge/force_fast_charge
+    echo "$FASTCHARGE" > /sys/kernel/fast_charge/force_fast_charge
 
-	  chmod 644 sys/kernel/notification_leds/off_timer_multiplier
-	  echo "$LED" > /sys/kernel/notification_leds/off_timer_multiplier
+    chmod 644 sys/kernel/notification_leds/off_timer_multiplier
+    echo "$LED" > /sys/kernel/notification_leds/off_timer_multiplier
 
 # Config autosmp
-	if [ "$MSM" = "1" ]
+    if [ "$MSM" = "1" ]
 	then
 		chmod 644 /sys/module/autosmp/parameters/enabled
-		echo "Y" > /sys/module/autosmp/parameters/enabled
+		echo "1" > /sys/module/autosmp/parameters/enabled
 		chmod 444 /sys/module/autosmp/parameters/enabled
 		chmod 777 /sys/devices/system/cpu/cpu1/online
-	fi
+    fi
 
-	if [ "$MSM" = "0" ]
+    if [ "$MSM" = "0" ]
 	then
 		chmod 644 /sys/module/autosmp/parameters/enabled
-		echo "N" > /sys/module/autosmp/parameters/enabled
+		echo "0" > /sys/module/autosmp/parameters/enabled
 		chmod 444 /sys/module/autosmp/parameters/enabled
 		chmod 777 /sys/devices/system/cpu/cpu1/online
 		echo "1" > /sys/devices/system/cpu/cpu1/online
 		chmod 444 /sys/devices/system/cpu/cpu1/online
-	fi
+    fi
 
-		chmod 777 /system/bin/mpdecision
-		rm -f /system/bin/mpdecision
-		chmod 777 /system/bin/thermald
-		rm -f /system/bin/thermald
-		chmod 777 /system/etc/thermald.conf
-		rm -f /system/etc/thermald.conf
-		chmod 777 /system/etc/init.post_boot.sh
-		rm -f /system/etc/init.post_boot.sh
-		chmod 777 /system/etc/init.qcom.post_boot.sh
-		rm -f /system/etc/init.qcom.post_boot.sh
+    chmod 777 /system/bin/mpdecision
+    rm -f /system/bin/mpdecision
+    chmod 777 /system/bin/thermald
+    rm -f /system/bin/thermald
+    chmod 777 /system/etc/thermald.conf
+    rm -f /system/etc/thermald.conf
+
 # Config I/O scheduler
     chmod 644 /sys/block/mmcblk0/queue/scheduler
     echo "$IO" > /sys/block/mmcblk0/queue/scheduler
