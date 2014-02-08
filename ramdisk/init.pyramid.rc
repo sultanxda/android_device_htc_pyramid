@@ -236,6 +236,10 @@ on property:sys.boot_completed=1
     write /sys/kernel/msm_thermal/conf/start 1
 
 # Services start here
+service adc_fixup /system/bin/cat /sys/devices/platform/msm_adc/batt_id
+    class main
+    oneshot
+
 service qcamerasvr /system/bin/mm-qcamera-daemon
     class main
     user system
