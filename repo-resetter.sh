@@ -2,12 +2,12 @@
 
 # Reset each repo in order to successfully repo sync
 echo Resetting each repo...
-cd $HOME/cm10.2/build
+cd build
 git reset --hard && git clean -f -d
-cd $HOME/cm10.2/packages/apps/Phone
+cd ../packages/apps/Phone
 git reset --hard && git clean -f -d
-cd $HOME/cm10.2/frameworks/opt/telephony
+cd ../../../frameworks/opt/telephony
 git reset --hard && git clean -f -d
-cd $HOME/cm10.2/packages/apps/Torch
+cd ../../../packages/apps/Torch
 git reset --hard && git clean -f -d
-cd $HOME/cm10.2
+cd ../../../
