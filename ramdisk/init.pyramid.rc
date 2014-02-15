@@ -173,7 +173,7 @@ on boot
     chmod 0660 /sys/class/timed_output/vibrator/voltage_level
     write /sys/class/timed_output/vibrator/voltage_level 3100
     chmod 0444 /sys/class/timed_output/vibrator/voltage_level
-    write /sys/devices/platform/msm_ssbi.0/pm8058-core/pm8xxx-vib/amp 100
+    write /sys/devices/platform/msm_ssbi.0/pm8058-core/pm8xxx-vib/amp 80
 
     # flashlight
     chown system camera /sys/class/leds/flashlight/brightness
