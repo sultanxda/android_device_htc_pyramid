@@ -32,7 +32,7 @@ BOARD_KERNEL_PAGE_SIZE := 2048
 BOARD_KERNEL_CMDLINE := console=ttyHSL0 androidboot.hardware=pyramid no_console_suspend=1
 
 # Kernel [Build]
-TARGET_KERNEL_CONFIG := sultan_defconfig
+TARGET_KERNEL_CONFIG := Sultan_defconfig
 BUILD_KERNEL := true
 
 # Bluetooth/Wifi
