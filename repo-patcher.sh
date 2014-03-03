@@ -2,10 +2,7 @@
 
 echo Patching each individual repo for regular building...
 
-cd build
-git reset --hard && git clean -f -d
-patch -p1 < ../device/htc/pyramid/patches/build-kernel.patch
-cd ../packages/apps/Phone
+cd packages/apps/Phone
 git reset --hard && git clean -f -d
 patch -p1 < ../../../device/htc/pyramid/patches/phone-nlj-s2w-patch.patch
 cd ../../../frameworks/opt/telephony
