@@ -1,163 +1,123 @@
 #!/system/bin/sh
-# ==============================
-#  BASIC AIO kernel MOD
-# ==============================
-#  Script base created by IBA21
-# ==============================
-#  Then modified by axetilen
-# ==============================
-#  Finally modified by Sultanxda
-# ==============================
 
-### Change your own settings here ###
+#### Change your own settings here ###
+ 
+## Sweep2Wake
+# 0 = Disabled
+# 1 = Enabled
+# 2 = Enabled (with no button backlight)
+SWEEP=0;
 
-## Config display undervolt
+## Display undervolt
 # Choose a value between
 # 0mV and 700mV that is a
 # multiple of 25.
 # Undervolt will be
-# 3100mV MINUS [what you choose]
+# 3100mV -MINUS- (what you choose)
 PANEL_UV=250;
 
-## Config 2D GPU clock
-# 145455000 = 145MHz
-# 160000000 = 160MHz
+## 3D GPU max frequency
+# 177778000 = 177MHz
 # 200000000 = 200MHz
-# 228571000 = 228MHz (229MHz)
-# 266667000 = 267MHz
-DD=200000000;
-
-## Config 3D GPU clock
 # 228571000 = 228MHz
 # 266667000 = 267MHz
 # 300000000 = 300MHz
 # 320000000 = 320MHz
 GPU=266667000;
 
-## Config I/O scheduler
-# deadline
-# cfq
-# noop
-# sio
-# vr
-# bfq
-IO=sio;
-
-## Enable Sweep2Wake
-# 0 = disabled
-# 1 = enabled
-# 2 = enabled (with no button backlight)
-SWEEP=0;
-
-## Enable Fastcharge
-# 0 = disabled
-# 1 = substitute AC to USB charging always
-# 2 = substitute AC to USB charging only if there is no USB peripheral detected
-FASTCHARGE=1;
-
-## Config CPU Frequency
-# Config CPU max frequency
+## CPU max frequency
 MAXFREQ=1512000;
 
-## Notification LED Duration Mod (Yank555)
-# 0 = Will blink forever until cleared by user
-# 1 = Will blink as requested by app or until cleared by user
-# 2 = Will blink TWICE as requested by app multiplied by value or until cleared by user
-# 5 = Will blink 5 TIMES as requested by app multiplied by value or until cleared by user
-# 10 = Will blink 10 TIMES as requested by app or until cleared by user
-# 60 = Will blink 60 TIMES as requested by app or until cleared by user
-# 255 = Will blink 255 TIMES as requested by app multiplied by value or until cleared by user
-LED=0;
+## CPU max frequency for EACH core
+MAX0=;
+MAX1=;
 
-## Config CPU governor
-# badass
-# intellidemand
-# ondemand
-# lagfree
-# performance
-# interactive
+## CPU governor
+# Ondemand
+# Lagfree
+# Performance
+# Interactive
 GOV=ondemand;
 
-## Mpdecision (Show-p1984)
-# 1 = enabled
-# 0 = disable mpdecision and force both CPU cores online
+## MPdecision
+# 1 = Enabled
+# 0 = MPdecision disabled and both CPU cores forced online
 MSM=1;
 
-##### This is the end of the area that you can configure #####
+## Capacitive-button backlight brightness
+# 1 = Backlight disabled
+# 2 = Dimmer
+# 3 = Normal
+BACK=3;
 
-
-### DO NOT CHANGE ANYTHING BELOW THIS LINE ###
-
-# Config Display UV
-	echo "$PANEL_UV" > /sys/module/msm_mipi/parameters/panel_uv
-
-# Config CPU governor
-    echo "$GOV" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-    echo "$GOV" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
-
-# Config CPU Frequency
-    chmod 644 /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
-    echo $MAXFREQ > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
-
-    chmod 644 /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq
-    echo $MAXFREQ > /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq
-
-# Config 3D GPU setting
-    chmod 644 /sys/devices/platform/kgsl-3d0.0/kgsl/kgsl-3d0/max_gpuclk
-    echo $GPU > /sys/devices/platform/kgsl-3d0.0/kgsl/kgsl-3d0/max_gpuclk
-
-# Config 2D GPU setting
-    chmod 644 /sys/devices/platform/kgsl-2d0.0/kgsl/kgsl-2d0/max_gpuclk
-    chmod 644 /sys/devices/platform/kgsl-2d0.0/kgsl/kgsl-2d0/gpuclk
-    chmod 644 /sys/devices/platform/kgsl-2d1.1/kgsl/kgsl-2d1/max_gpuclk
-    chmod 644 /sys/devices/platform/kgsl-2d1.1/kgsl/kgsl-2d1/gpuclk
-    echo $DD > /sys/devices/platform/kgsl-2d0.0/kgsl/kgsl-2d0/max_gpuclk
-    echo $DD > /sys/devices/platform/kgsl-2d0.0/kgsl/kgsl-2d0/gpuclk
-    echo $DD > /sys/devices/platform/kgsl-2d1.1/kgsl/kgsl-2d1/max_gpuclk
-    echo $DD > /sys/devices/platform/kgsl-2d1.1/kgsl/kgsl-2d1/gpuclk
+####### DO NOT CHANGE ANYTHING BELOW THIS LINE #######
 
 # Config Sweep2Wake
-    chmod 644 /sys/android_touch/sweep2wake
-    echo "$SWEEP" > /sys/android_touch/sweep2wake
+chmod 664 /sys/android_touch/sweep2wake
+echo "$SWEEP" > /sys/android_touch/sweep2wake
 
-# Config Notification LED Time-out
-    chmod 644 sys/kernel/notification_leds/off_timer_multiplier
-    echo "$LED" > /sys/kernel/notification_leds/off_timer_multiplier
+# Config CPU governor
+chmod 664 /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+chmod 664 /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
+echo "$GOV" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+echo "$GOV" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
+chmod 444 /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+chmod 444 /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
 
-    chmod 644 /sys/kernel/fast_charge/force_fast_charge
-    echo "$FASTCHARGE" > /sys/kernel/fast_charge/force_fast_charge
+# Config Display UV
+echo "$PANEL_UV" > /sys/module/msm_mipi/parameters/panel_uv
 
-    chmod 644 sys/kernel/notification_leds/off_timer_multiplier
-    echo "$LED" > /sys/kernel/notification_leds/off_timer_multiplier
+# Config CPU Frequency
+chmod 664 /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+chmod 664 /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq
+echo $MAXFREQ > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+echo $MAXFREQ > /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq
+echo $MAX0 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+echo $MAX1 > /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq
 
-# Config autosmp
-    if [ "$MSM" = "1" ]
-	then
-		chmod 644 /sys/module/autosmp/parameters/enabled
-		echo "1" > /sys/module/autosmp/parameters/enabled
-		chmod 444 /sys/module/autosmp/parameters/enabled
-		chmod 777 /sys/devices/system/cpu/cpu1/online
-    fi
+# Config 3D GPU setting
+chmod 664 /sys/devices/platform/kgsl-3d0.0/kgsl/kgsl-3d0/max_gpuclk
+echo $GPU > /sys/devices/platform/kgsl-3d0.0/kgsl/kgsl-3d0/max_gpuclk
 
-    if [ "$MSM" = "0" ]
-	then
-		chmod 644 /sys/module/autosmp/parameters/enabled
-		echo "0" > /sys/module/autosmp/parameters/enabled
-		chmod 444 /sys/module/autosmp/parameters/enabled
-		chmod 777 /sys/devices/system/cpu/cpu1/online
-		echo "1" > /sys/devices/system/cpu/cpu1/online
-		chmod 444 /sys/devices/system/cpu/cpu1/online
-    fi
+# Config MPdecision
+if [ "$MSM" = "1" ]
+then
+	chmod 664 /sys/module/autosmp/parameters/enabled
+	echo "Y" > /sys/module/autosmp/parameters/enabled
+	chmod 444 /sys/module/autosmp/parameters/enabled
+	chmod 664 /sys/devices/system/cpu/cpu1/online
+fi
 
-    chmod 777 /system/bin/mpdecision
-    rm -f /system/bin/mpdecision
-    chmod 777 /system/bin/thermald
-    rm -f /system/bin/thermald
-    chmod 777 /system/etc/thermald.conf
-    rm -f /system/etc/thermald.conf
+if [ "$MSM" = "0" ]
+then
+	chmod 664 /sys/module/autosmp/parameters/enabled
+	echo "0" > /sys/module/autosmp/parameters/enabled
+	chmod 444 /sys/module/autosmp/parameters/enabled
+	chmod 664 /sys/devices/system/cpu/cpu1/online
+	echo "1" > /sys/devices/system/cpu/cpu1/online
+	chmod 444 /sys/devices/system/cpu/cpu1/online
+fi
 
-# Config I/O scheduler
-    chmod 644 /sys/block/mmcblk0/queue/scheduler
-    echo "$IO" > /sys/block/mmcblk0/queue/scheduler
-    chmod 644 /sys/block/mmcblk1/queue/scheduler
-    echo "$IO" > /sys/block/mmcblk1/queue/scheduler
+# Capacitive buttons backlight
+chown root:root /sys/devices/platform/leds-pm8058/leds/button-backlight/currents
+
+if [ "$BACK" = "1" ]
+then
+	chmod 777 /sys/devices/platform/leds-pm8058/leds/button-backlight/currents
+	echo "0" > /sys/devices/platform/leds-pm8058/leds/button-backlight/currents
+	chmod 444 /sys/devices/platform/leds-pm8058/leds/button-backlight/currents
+fi
+
+if [ "$BACK" = "2" ]
+then
+	chmod 777 /sys/devices/platform/leds-pm8058/leds/button-backlight/currents
+	echo "4" > /sys/devices/platform/leds-pm8058/leds/button-backlight/currents
+	chmod 444 /sys/devices/platform/leds-pm8058/leds/button-backlight/currents
+fi
+
+if [ "$BACK" = "3" ]
+then
+	chmod 777 /sys/devices/platform/leds-pm8058/leds/button-backlight/currents
+	echo "8" > /sys/devices/platform/leds-pm8058/leds/button-backlight/currents
+	chmod 444 /sys/devices/platform/leds-pm8058/leds/button-backlight/currents
+fi
