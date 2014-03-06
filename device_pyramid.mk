@@ -109,6 +109,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
       htc.audio.alt.enable=0 \
       htc.audio.hac.enable=0
 
+# Dalvik-cache config
 $(call inherit-product, frameworks/native/build/phone-xhdpi-1024-dalvik-heap.mk)
 
 # Qcom scripts
@@ -225,7 +226,7 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     device/htc/pyramid/firmware/vidc_1080p.fw:system/etc/firmware/vidc_1080p.fw
 
-# Device uses high-density artwork where available
+# Use high-density artwork where available
 PRODUCT_AAPT_CONFIG := normal hdpi
 PRODUCT_AAPT_PREF_CONFIG := hdpi
 
@@ -236,15 +237,14 @@ PRODUCT_PROPERTY_OVERRIDES += \
     ro.com.google.locationfeatures=1 \
     dalvik.vm.dexopt-flags=m=y \
     ro.goo.version=$(shell date +%s) \
+
+# Qcom build properties
+PRODUCT_PROPERTY_OVERRIDES += \
     com.qc.hardware=true \
-    debug.enabletr=true \
-    debug.egl.hw=1 \
+    debug.mdpcomp.maxlayer=3 \
     debug.mdpcomp.logs=0 \
+    debug.egl.hw=1 \
     debug.sf.hw=1 \
-    dev.pm.dyn_samplingrate=1 \
     ro.opengles.version=131072 \
     debug.hwc.dynThreshold=1.9 \
-    lpa.decode=false \
-    ro.zygote.disable_gl_preload=true \
-    debug.hwui.render_dirty_regions=false \
     debug.egl.recordable.rgba8888=1
