@@ -14,26 +14,22 @@
 # limitations under the License.
 #
 
-
-# common msm8660 configs
-$(call inherit-product, device/htc/msm8660-common/msm8660.mk)
-
+# Inherits
 $(call inherit-product, $(SRC_TARGET_DIR)/product/languages_full.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
 
+# Overlays
 DEVICE_PACKAGE_OVERLAYS += device/htc/pyramid/overlay
 
 # GPS
+PRODUCT_COPY_FILES += device/common/gps/gps.conf_US:system/etc/gps.conf
 PRODUCT_PACKAGES += \
     gps.pyramid
 
-## The gps config appropriate for this device
-PRODUCT_COPY_FILES += device/common/gps/gps.conf_US:system/etc/gps.conf
-
 # Bluetooth firmware
-$(call inherit-product, device/htc/msm8660-common/bcm_hcd.mk)
-
-$(call inherit-product-if-exists, hardware/broadcom/wlan/bcmdhd/firmware/bcm4329/device-bcm.mk)
+PRODUCT_COPY_FILES += \
+    device/htc/pyramid/firmware/bcm4330.hcd:system/vendor/firmware/bcm4330.hcd \
+    device/htc/pyramid/firmware/bcm4329.hcd:system/vendor/firmware/bcm4329.hcd
 
 # Boot ramdisk setup
 PRODUCT_COPY_FILES += \
@@ -42,7 +38,7 @@ PRODUCT_COPY_FILES += \
     device/htc/pyramid/ramdisk/init.pyramid.usb.rc:root/init.pyramid.usb.rc \
     device/htc/pyramid/ramdisk/ueventd.pyramid.rc:root/ueventd.pyramid.rc
 
-## recovery and custom charging
+# Recovery and custom charging
 PRODUCT_COPY_FILES += \
     device/htc/pyramid/recovery/sbin/choice_fn:recovery/root/sbin/choice_fn \
     device/htc/pyramid/recovery/sbin/power_test:recovery/root/sbin/power_test \
@@ -50,7 +46,7 @@ PRODUCT_COPY_FILES += \
     device/htc/pyramid/recovery/sbin/detect_key:recovery/root/sbin/detect_key \
     device/htc/pyramid/recovery/sbin/htcbatt:recovery/root/sbin/htcbatt
 
-# Some misc configuration files
+# Misc configuration files
 PRODUCT_COPY_FILES += \
     device/htc/pyramid/configs/89z_kernel:system/etc/init.d/89z_kernel
 
@@ -96,29 +92,159 @@ PRODUCT_COPY_FILES += \
     device/htc/pyramid/dsp/soundimage/Sound_Recording.txt:system/etc/soundimage/Sound_Recording.txt \
     device/htc/pyramid/dsp/soundimage/Sound_Rec_Portrait.txt:system/etc/soundimage/Sound_Rec_Portrait.txt
 
-# Permissions
+# Telephony permissions
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.telephony.gsm.xml:system/etc/permissions/android.hardware.telephony.gsm.xml
 
-## misc
+# Vendor setup
+$(call inherit-product-if-exists, vendor/htc/pyramid/pyramid-vendor.mk)
+
+# Media capabilities
+PRODUCT_PROPERTY_OVERRIDES += \
+      media.a1026.nsForVoiceRec            = 0 \
+      media.a1026.enableA1026              = 0
+
+# HTC audio
+PRODUCT_PROPERTY_OVERRIDES += \
+      htc.audio.alt.enable=0 \
+      htc.audio.hac.enable=0
+
+$(call inherit-product, frameworks/native/build/phone-xhdpi-1024-dalvik-heap.mk)
+
+# Qcom scripts
+PRODUCT_COPY_FILES += \
+    device/htc/pyramid/prebuilt/init.qcom.post_boot.sh:system/etc/init.qcom.post_boot.sh \
+    device/htc/pyramid/prebuilt/init.qcom.efs.sync.sh:system/etc/init.qcom.efs.sync.sh
+
+# Permissions
+PRODUCT_COPY_FILES += \
+    frameworks/native/data/etc/handheld_core_hardware.xml:system/etc/permissions/handheld_core_hardware.xml \
+    frameworks/native/data/etc/android.hardware.camera.front.xml:system/etc/permissions/android.hardware.camera.front.xml \
+    frameworks/native/data/etc/android.hardware.location.gps.xml:system/etc/permissions/android.hardware.location.gps.xml \
+    frameworks/native/data/etc/android.hardware.wifi.xml:system/etc/permissions/android.hardware.wifi.xml \
+    frameworks/native/data/etc/android.hardware.bluetooth.xml:system/etc/permissions/android.hardware.bluetooth.xml \
+    frameworks/native/data/etc/android.hardware.sensor.proximity.xml:system/etc/permissions/android.hardware.sensor.proximity.xml \
+    frameworks/native/data/etc/android.hardware.sensor.light.xml:system/etc/permissions/android.hardware.sensor.light.xml \
+    frameworks/native/data/etc/android.hardware.sensor.gyroscope.xml:system/etc/permissions/android.hardware.sensor.gyroscope.xml \
+    frameworks/native/data/etc/android.hardware.touchscreen.multitouch.distinct.xml:system/etc/permissions/android.hardware.touchscreen.multitouch.distinct.xml \
+    frameworks/native/data/etc/android.hardware.usb.accessory.xml:system/etc/permissions/android.hardware.usb.accessory.xml \
+    frameworks/native/data/etc/android.hardware.usb.host.xml:system/etc/permissions/android.hardware.usb.host.xml \
+    frameworks/native/data/etc/android.software.sip.voip.xml:system/etc/permissions/android.software.sip.voip.xml \
+    frameworks/native/data/etc/android.hardware.sensor.accelerometer.xml:system/etc/permissions/android.hardware.sensor.accelerometer.xml \
+    frameworks/native/data/etc/android.hardware.sensor.compass.xml:system/etc/permissions/android.hardware.sensor.compass.xml \
+    packages/wallpapers/LivePicker/android.software.live_wallpaper.xml:system/etc/permissions/android.software.live_wallpaper.xml
+
+# WiFi
+PRODUCT_COPY_FILES += \
+    device/htc/pyramid/wpa_supplicant_overlay.conf:system/etc/wifi/wpa_supplicant_overlay.conf
+
+# Audio
+PRODUCT_PACKAGES += \
+    audio.a2dp.default \
+    audio_policy.msm8660 \
+    audio.primary.msm8660 \
+    audio_policy.conf \
+    libaudioutils \
+    libaudio-resampler \
+    audio.usb.default \
+    Camera2
+
+# GPS
+PRODUCT_COPY_FILES += \
+    device/common/gps/gps.conf_US_SUPL:system/etc/gps.conf
+
+# Graphics
+PRODUCT_PACKAGES += \
+    copybit.msm8660 \
+    gralloc.msm8660 \
+    hwcomposer.msm8660 \
+    lights.msm8660 \
+    libgenlock \
+    libmemalloc \
+    liboverlay \
+    libqdutils \
+    libtilerenderer \
+    libc2dcolorconvert
+
+# OMX
+PRODUCT_PACKAGES += \
+    libdivxdrmdecrypt \
+    libmm-omxcore \
+    libOmxCore \
+    libOmxVdec \
+    libOmxVenc \
+    libOmxAacEnc \
+    libOmxAmrEnc \
+    libOmxQcelp13Enc \
+    libOmxEvrcEnc \
+    libv8 \
+    libOmxAmrEnc
+
+# Camera
+PRODUCT_PACKAGES += \
+    camera.msm8660 \
+    libsurfaceflinger_client \
+    libstagefrighthw \
+
+# Net
+PRODUCT_PACKAGES += \
+    libnetcmdiface
+
+# GooManager
+PRODUCT_PACKAGES += \
+    GooManager
+
+# Power
+PRODUCT_PACKAGES += \
+    power.msm8660
+
+# Torch
+PRODUCT_PACKAGES += \
+    Torch
+
+# USB
+PRODUCT_PACKAGES += \
+    com.android.future.usb.accessory
+
+# Filesystem-management tools
+PRODUCT_PACKAGES += \
+    make_ext4fs \
+    setup_fs
+
+# Media configuration
+PRODUCT_COPY_FILES += \
+    device/htc/pyramid/configs/media_codecs.xml:system/etc/media_codecs.xml \
+    device/htc/pyramid/configs/media_profiles.xml:system/etc/media_profiles.xml
+
+# Adreno firmware
+PRODUCT_COPY_FILES += \
+    device/htc/pyramid/firmware/leia_pfp_470.fw:system/etc/firmware/leia_pfp_470.fw \
+    device/htc/pyramid/firmware/leia_pm4_470.fw:system/etc/firmware/leia_pm4_470.fw
+
+# Vidc firmware
+PRODUCT_COPY_FILES += \
+    device/htc/pyramid/firmware/vidc_1080p.fw:system/etc/firmware/vidc_1080p.fw
+
+# Device uses high-density artwork where available
+PRODUCT_AAPT_CONFIG := normal hdpi
+PRODUCT_AAPT_PREF_CONFIG := hdpi
+
+# Common build properties
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.setupwizard.enable_bypass=1 \
     dalvik.vm.lockprof.threshold=500 \
     ro.com.google.locationfeatures=1 \
     dalvik.vm.dexopt-flags=m=y \
-    ro.goo.version=$(shell date +%s)
-
-# call the proprietary setup
-$(call inherit-product-if-exists, vendor/htc/pyramid/pyramid-vendor.mk)
-
-# media profiles and capabilities spec
-$(call inherit-product, device/htc/pyramid/media_a1026.mk)
-
-## htc audio settings
-$(call inherit-product, device/htc/pyramid/media_htcaudio.mk)
-
-$(call inherit-product, frameworks/native/build/phone-xhdpi-1024-dalvik-heap.mk)
-
-# Device ID
-PRODUCT_NAME := full_pyramid
-PRODUCT_DEVICE := pyramid
+    ro.goo.version=$(shell date +%s) \
+    com.qc.hardware=true \
+    debug.enabletr=true \
+    debug.egl.hw=1 \
+    debug.mdpcomp.logs=0 \
+    debug.sf.hw=1 \
+    dev.pm.dyn_samplingrate=1 \
+    ro.opengles.version=131072 \
+    debug.hwc.dynThreshold=1.9 \
+    lpa.decode=false \
+    ro.zygote.disable_gl_preload=true \
+    debug.hwui.render_dirty_regions=false \
+    debug.egl.recordable.rgba8888=1
