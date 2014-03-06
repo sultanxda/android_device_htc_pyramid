@@ -169,23 +169,15 @@ on boot
     chmod 0660 /sys/devices/platform/msm_ssbi.0/pm8058-core/pm8xxx-vib/amp
 
     # set vibration intensity to the maximum allowed in the kernel
-    chown system camera /sys/class/timed_output/vibrator/voltage_level
     chmod 0660 /sys/class/timed_output/vibrator/voltage_level
     write /sys/class/timed_output/vibrator/voltage_level 3100
     chmod 0444 /sys/class/timed_output/vibrator/voltage_level
-    write /sys/devices/platform/msm_ssbi.0/pm8058-core/pm8xxx-vib/amp 80
 
     # flashlight
     chown system camera /sys/class/leds/flashlight/brightness
 
     # allow Torch to write to flashlight file
     chmod 0660 /sys/class/leds/flashlight/brightness
-
-    # fix Camera crashing phone when taking photo with flash
-    chown system camera /sys/class/leds/flashlight/max_brightness
-    chmod 0660 /sys/class/leds/flashlight/max_brightness
-    write /sys/class/leds/flashlight/max_brightness 3
-    chmod 0444 /sys/class/leds/flashlight/max_brightness
 
     # sync fs
     chown system /sys/devices/platform/rs300000a7.65536/force_sync
