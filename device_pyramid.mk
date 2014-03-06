@@ -28,7 +28,6 @@ PRODUCT_PACKAGES += \
 
 # Bluetooth firmware
 PRODUCT_COPY_FILES += \
-    device/htc/pyramid/firmware/bcm4330.hcd:system/vendor/firmware/bcm4330.hcd \
     device/htc/pyramid/firmware/bcm4329.hcd:system/vendor/firmware/bcm4329.hcd
 
 # Boot ramdisk setup
