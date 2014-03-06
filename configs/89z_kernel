@@ -118,6 +118,6 @@ fi
 if [ "$BACK" = "3" ]
 then
 	chmod 777 /sys/devices/platform/leds-pm8058/leds/button-backlight/currents
-	echo "8" > /sys/devices/platform/leds-pm8058/leds/button-backlight/currents
+	echo "10" > /sys/devices/platform/leds-pm8058/leds/button-backlight/currents
 	chmod 444 /sys/devices/platform/leds-pm8058/leds/button-backlight/currents
 fi
