@@ -163,13 +163,13 @@ PRODUCT_PACKAGES += \
     libmemalloc \
     liboverlay \
     libqdutils \
-    libtilerenderer \
-    libc2dcolorconvert
+    libtilerenderer
 
 # OMX
 PRODUCT_PACKAGES += \
     libdivxdrmdecrypt \
     libmm-omxcore \
+    libc2dcolorconvert \
     libOmxCore \
     libOmxVdec \
     libOmxVenc \
