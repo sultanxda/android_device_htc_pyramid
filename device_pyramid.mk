@@ -135,6 +135,7 @@ PRODUCT_COPY_FILES += \
     packages/wallpapers/LivePicker/android.software.live_wallpaper.xml:system/etc/permissions/android.software.live_wallpaper.xml
 
 # WiFi
+$(call inherit-product-if-exists, hardware/broadcom/wlan/bcmdhd/firmware/bcm4329/device-bcm.mk)
 PRODUCT_COPY_FILES += \
     device/htc/pyramid/wpa_supplicant_overlay.conf:system/etc/wifi/wpa_supplicant_overlay.conf
 
