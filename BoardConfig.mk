@@ -20,31 +20,111 @@
 # definition file).
 #
 
-# inherit from common msm8660
--include device/htc/msm8660-common/BoardConfigCommon.mk
-
 # Bootloader
+BOARD_VENDOR := htc
 TARGET_BOOTLOADER_BOARD_NAME := pyramid
+TARGET_NO_BOOTLOADER := true
 
-# Kernel [Settings]
+# Platform
+TARGET_BOARD_PLATFORM := msm8660
+
+# Kernel
+BUILD_KERNEL := true
+TARGET_KERNEL_CONFIG := Sultan_defconfig
+TARGET_KERNEL_SOURCE := kernel/htc/pyramid
 BOARD_KERNEL_BASE := 0x48000000
 BOARD_KERNEL_PAGE_SIZE := 2048
 BOARD_KERNEL_CMDLINE := console=ttyHSL0 androidboot.hardware=pyramid no_console_suspend=1
 
-# Kernel [Build]
-TARGET_KERNEL_CONFIG := Sultan_defconfig
-BUILD_KERNEL := true
+# Architecture
+COMMON_GLOBAL_CFLAGS += -DQCOM_HARDWARE
+TARGET_CPU_VARIANT := scorpion
+TARGET_CPU_ABI := armeabi-v7a
+TARGET_CPU_ABI2 := armeabi
+TARGET_ARCH := arm
+TARGET_ARCH_VARIANT := armv7-a-neon
+TARGET_CPU_SMP := true
+TARGET_ENABLE_QC_AV_ENHANCEMENTS := true
 
-# Bluetooth/Wifi
--include device/htc/msm8660-common/bcmdhd.mk
+# Qcom hardware
+BOARD_USES_QCOM_HARDWARE := true
+TARGET_QCOM_DISPLAY_VARIANT := caf
+TARGET_QCOM_MEDIA_VARIANT := legacy
+TARGET_USE_QCOM_BIONIC_OPTIMIZATION := true
 
-# Qcom GPS
+# Audio
+COMMON_GLOBAL_CFLAGS += -DHTC_ACOUSTIC_AUDIO -DLEGACY_QCOM_VOICE
+TARGET_QCOM_AUDIO_VARIANT := caf
+BOARD_QCOM_TUNNEL_LPA_ENABLED := false
+
+# WiFi
+BOARD_HOSTAPD_DRIVER             := NL80211
+BOARD_HOSTAPD_PRIVATE_LIB        := lib_driver_cmd_bcmdhd
+BOARD_WLAN_DEVICE                := bcmdhd
+BOARD_WPA_SUPPLICANT_DRIVER      := NL80211
+BOARD_WPA_SUPPLICANT_PRIVATE_LIB := lib_driver_cmd_bcmdhd
+WIFI_BAND                        := 802_11_ABG
+WIFI_DRIVER_FW_PATH_STA          := "/vendor/firmware/fw_bcmdhd.bin"
+WIFI_DRIVER_FW_PATH_AP           := "/vendor/firmware/fw_bcmdhd_apsta.bin"
+WIFI_DRIVER_FW_PATH_PARAM        := "/sys/module/bcmdhd/parameters/firmware_path"
+WPA_SUPPLICANT_VERSION           := VER_0_8_X
+
+# Bluetooth
+BOARD_HAVE_BLUETOOTH := true
+BOARD_HAVE_BLUETOOTH_BCM := true
+BOARD_BLUEDROID_VENDOR_CONF := device/htc/pyramid/bluetooth/vnd_msm8660.txt
+BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := device/htc/pyramid/bluetooth/include
+
+# Camera
+BOARD_USES_QCOM_LEGACY_CAM_PARAMS := true
+BOARD_USES_PMEM_ADSP := true
+COMMON_GLOBAL_CFLAGS += -DICS_CAMERA_BLOB -DNO_UPDATE_PREVIEW
+BOARD_HAVE_HTC_FFC := true
+BOARD_NEEDS_MEMORYHEAPPMEM := true
+TARGET_DISABLE_ARM_PIE := true
+# Camera wrapper
+COMMON_GLOBAL_CFLAGS += -DDISABLE_HW_ID_MATCH_CHECK
+
+# GPS
 BOARD_VENDOR_QCOM_GPS_LOC_API_HARDWARE := pyramid
+BOARD_USES_QCOM_GPS := true
+BOARD_VENDOR_QCOM_GPS_LOC_API_AMSS_VERSION := 50000
+
+# Graphics
+USE_OPENGL_RENDERER := true
+TARGET_USES_ION := true
+TARGET_USES_C2D_COMPOSITION := true
+BOARD_EGL_CFG := device/htc/pyramid/configs/egl.cfg
+NUM_FRAMEBUFFER_SURFACE_BUFFERS := 3
+TARGET_DISPLAY_INSECURE_MM_HEAP := true
+TARGET_DISPLAY_USE_RETIRE_FENCE := true
+
+# Qcom BSP (Board Support Package)
+TARGET_USES_QCOM_BSP := true
+COMMON_GLOBAL_CFLAGS += -DQCOM_BSP
+
+# Power
+TARGET_USES_CM_POWERHAL := true
+
+# Lights
+TARGET_PROVIDES_LIBLIGHT := true
 
 # RIL
 BOARD_USES_LEGACY_RIL := true
 
+# Webkit
+ENABLE_WEBGL := true
+TARGET_FORCE_CPU_UPLOAD := true
+
+# Hardware tunables
+BOARD_HARDWARE_CLASS := device/htc/pyramid/cmhw/
+
+# Recovery
+TARGET_RECOVERY_FSTAB := device/htc/pyramid/ramdisk/fstab.pyramid
+RECOVERY_FSTAB_VERSION := 2
+
 # Filesystem
+BOARD_VOLD_MAX_PARTITIONS := 36
 TARGET_USERIMAGES_USE_EXT4 := true
 BOARD_BOOTIMAGE_PARTITION_SIZE := 16777216
 BOARD_RECOVERYIMAGE_PARTITION_SIZE := 16776192

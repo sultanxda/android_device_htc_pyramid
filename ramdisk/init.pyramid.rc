@@ -23,8 +23,6 @@ on init
     mount vfat /dev/block/mmcblk0p17 /vendor/firmware/misc ro shortname=lower
     mount vfat /dev/block/mmcblk0p19 /vendor/firmware/adsp ro shortname=lower
 
-    symlink /vendor/firmware/adsp/q6.b09 /vendor/firmware/q6.b09
-    symlink /vendor/firmware/adsp/q6.b08 /vendor/firmware/q6.b08
     symlink /vendor/firmware/adsp/q6.b07 /vendor/firmware/q6.b07
     symlink /vendor/firmware/adsp/q6.b06 /vendor/firmware/q6.b06
     symlink /vendor/firmware/adsp/q6.b05 /vendor/firmware/q6.b05
@@ -71,7 +69,6 @@ on fs
 
     symlink /system/vendor/firmware/fw_bcmdhd.bin /vendor/firmware/fw_bcmdhd.bin
     symlink /system/vendor/firmware/fw_bcmdhd_apsta.bin /vendor/firmware/fw_bcmdhd_apsta.bin
-    symlink /system/vendor/firmware/fw_bcmdhd_p2p.bin /vendor/firmware/fw_bcmdhd_p2p.bin
     symlink /system/vendor/firmware/bcm4329.hcd /vendor/firmware/bcm4329.hcd
 
     # TEMP HACK 
