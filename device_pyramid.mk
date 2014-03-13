@@ -100,8 +100,8 @@ $(call inherit-product-if-exists, vendor/htc/pyramid/pyramid-vendor.mk)
 
 # Media capabilities
 PRODUCT_PROPERTY_OVERRIDES += \
-      media.a1026.nsForVoiceRec            = 0 \
-      media.a1026.enableA1026              = 0
+      media.a1026.nsForVoiceRec=0 \
+      media.a1026.enableA1026=0
 
 # HTC audio
 PRODUCT_PROPERTY_OVERRIDES += \
@@ -136,8 +136,6 @@ PRODUCT_COPY_FILES += \
 
 # WiFi
 $(call inherit-product-if-exists, hardware/broadcom/wlan/bcmdhd/firmware/bcm4329/device-bcm.mk)
-PRODUCT_COPY_FILES += \
-    device/htc/pyramid/wpa_supplicant_overlay.conf:system/etc/wifi/wpa_supplicant_overlay.conf
 
 # Audio
 PRODUCT_PACKAGES += \
@@ -147,8 +145,7 @@ PRODUCT_PACKAGES += \
     audio_policy.conf \
     libaudioutils \
     libaudio-resampler \
-    audio.usb.default \
-    Camera2
+    audio.usb.default
 
 # GPS
 PRODUCT_COPY_FILES += \
@@ -185,7 +182,7 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     camera.msm8660 \
     libsurfaceflinger_client \
-    libstagefrighthw \
+    libstagefrighthw
 
 # Net
 PRODUCT_PACKAGES += \
@@ -236,7 +233,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
     dalvik.vm.lockprof.threshold=500 \
     ro.com.google.locationfeatures=1 \
     dalvik.vm.dexopt-flags=m=y \
-    ro.goo.version=$(shell date +%s) \
+    ro.goo.version=$(shell date +%s)
 
 # Qcom build properties
 PRODUCT_PROPERTY_OVERRIDES += \

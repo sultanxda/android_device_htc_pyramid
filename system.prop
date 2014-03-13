@@ -32,7 +32,7 @@ wifi.supplicant_scan_interval=160
 #
 # GooManager
 ro.goo.developerid=sultanxda
-ro.goo.rom=SultanCM11pyramid
+ro.goo.rom=SultanCMpyramid
 ro.goo.board=pyramid
 #
 # Power Saving/Sleep
