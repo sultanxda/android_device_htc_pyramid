@@ -6,6 +6,4 @@ cd build
 git reset --hard && git clean -f -d
 cd ../frameworks/opt/telephony
 git reset --hard && git clean -f -d
-cd ../../../packages/apps/Torch
-git reset --hard && git clean -f -d
 cd ../../../
