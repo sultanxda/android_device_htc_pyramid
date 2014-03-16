@@ -147,8 +147,7 @@ PRODUCT_PACKAGES += \
     audio_policy.conf \
     libaudioutils \
     libaudio-resampler \
-    audio.usb.default \
-    Camera2
+    audio.usb.default
 
 # GPS
 PRODUCT_COPY_FILES += \
@@ -159,6 +158,7 @@ PRODUCT_PACKAGES += \
     copybit.msm8660 \
     gralloc.msm8660 \
     hwcomposer.msm8660 \
+    memtrack.msm8660 \
     lights.msm8660 \
     libgenlock \
     libmemalloc \
@@ -185,7 +185,7 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     camera.msm8660 \
     libsurfaceflinger_client \
-    libstagefrighthw \
+    libstagefrighthw
 
 # Net
 PRODUCT_PACKAGES += \
@@ -236,7 +236,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
     dalvik.vm.lockprof.threshold=500 \
     ro.com.google.locationfeatures=1 \
     dalvik.vm.dexopt-flags=m=y \
-    ro.goo.version=$(shell date +%s) \
+    ro.goo.version=$(shell date +%s)
 
 # Qcom build properties
 PRODUCT_PROPERTY_OVERRIDES += \
