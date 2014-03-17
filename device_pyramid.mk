@@ -245,6 +245,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
     debug.mdpcomp.logs=0 \
     debug.egl.hw=1 \
     debug.sf.hw=1 \
+    lpa.decode=true \
     ro.opengles.version=131072 \
     debug.hwc.dynThreshold=1.9 \
     debug.egl.recordable.rgba8888=1
