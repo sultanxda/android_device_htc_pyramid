@@ -1,19 +1,20 @@
 import init.pyramid.usb.rc
 
 on init
-    mkdir /mnt/media_rw 0770 media_rw media_rw
-    mkdir /mnt/media_rw/sdcard0 0700 media_rw media_rw
-    mkdir /mnt/media_rw/usbdisk 0700 media_rw media_rw
 
-    mkdir /storage/sdcard0 0700 root root
-    mkdir /storage/usbdisk 0700 root root
+    export EXTERNAL_STORAGE /storage/sdcard0
+
+    mkdir /storage/sdcard0 0000 root root
+    mkdir /storage/usbdisk 0000 root root
+
+    mkdir /mnt/media_rw/sdcard0 0000 system system
+    mkdir /mnt/media_rw/usbdisk 0000 system system
 
     # for backwards compatibility
-    symlink /storage/sdcard0 /sdcard
     symlink /storage/sdcard0 /mnt/sdcard
-    export EXTERNAL_STORAGE /storage/sdcard0
-    symlink /storage/usbdisk /usbdisk
+    symlink /storage/sdcard0 /sdcard
     symlink /storage/usbdisk /mnt/usbdisk
+    symlink /storage/usbdisk /usbdisk
 
     # load msm8660 firmware so things have time to initialize
     rm /vendor
@@ -157,10 +158,6 @@ on boot
     # for slate charging timer
     chown radio /sys/class/power_supply/battery/charger_timer
 
-    # for flip to speaker
-    chown radio radio /sys/class/htc_accelerometer/accelerometer/PhoneOnOffFlag
-    chown radio radio /sys/class/htc_ecompass/ecompass/PhoneOnOffFlag
-
     #Vibrator
     chown system system /sys/devices/platform/msm_ssbi.0/pm8058-core/pm8xxx-vib/amp
     chmod 0660 /sys/devices/platform/msm_ssbi.0/pm8058-core/pm8xxx-vib/amp
@@ -176,11 +173,16 @@ on boot
     # allow Torch to write to flashlight file
     chmod 0660 /sys/class/leds/flashlight/brightness
 
-    # sync fs
-    chown system /sys/devices/platform/rs300000a7.65536/force_sync
-    chown system /sys/devices/platform/rs300000a7.65536/sync_sts
-
 # Services start here
+
+service fuse_sdcard0 /system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/sdcard0 /storage/sdcard0
+    class main
+
+service fuse_usbdisk /system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/usbdisk /storage/usbdisk
+    class main
+
+service netmgrd /system/bin/netmgrd
+    class core
 
 service dhcpcd_wlan0 /system/bin/dhcpcd -aABDKL
     class main
@@ -192,11 +194,6 @@ service dhcpcd_bt-pan /system/bin/dhcpcd -ABKL
     disabled
     oneshot
 
-service hdmid /system/bin/hdmid
-    class main
-    socket hdmid stream 0660 root system graphics
-    disabled
-
 service htcbatt /system/bin/htcbatt
     class main
     user root
@@ -206,22 +203,10 @@ service iprenew_wlan0 /system/bin/dhcpcd -n
     disabled
     oneshot
 
-# service mpdecision /system/bin/mpdecision --no_sleep --avg_comp --single_core_while_panel_off
-  # user root
-   # disabled
-
-service netmgrd /system/bin/netmgrd
-    class main
-
 service qcom-post-boot /system/bin/sh /system/etc/init.qcom.post_boot.sh
     class main
     user root
     disabled
-
-#service qcom-sh /system/bin/sh /init.qcom.sh
-#    class core
-#    user root
-#    oneshot
 
 service qmuxd /system/bin/qmuxd
     class main
@@ -231,11 +216,6 @@ service qmuxd /system/bin/qmuxd
 service rmt_storage /system/bin/rmt_storage /dev/block/mmcblk0p26 /dev/block/mmcblk0p27 /dev/block/mmcblk0p18
     class core
     user root
-
-# service thermald /system/bin/thermald
-#    user root
-#    group root
-#    disabled
 
 service wpa_supplicant /system/bin/wpa_supplicant \
     -iwlan0 -Dnl80211 -c/data/misc/wifi/wpa_supplicant.conf \
@@ -248,14 +228,6 @@ service wpa_supplicant /system/bin/wpa_supplicant \
     socket wpa_wlan0 dgram 660 wifi wifi
     disabled
     oneshot
-
-service fuse_sdcard0 /system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/sdcard0 /storage/sdcard0
-    class late_start
-    disabled
-
-service fuse_usbdisk /system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/usbdisk /storage/usbdisk
-    class late_start
-    disabled
 
 on property:init.svc.bootanim=stopped
     start qcom-post-boot
