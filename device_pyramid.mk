@@ -240,11 +240,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
 # Qcom build properties
 PRODUCT_PROPERTY_OVERRIDES += \
     com.qc.hardware=true \
-    debug.mdpcomp.maxlayer=3 \
-    debug.mdpcomp.logs=0 \
-    debug.egl.hw=1 \
-    debug.sf.hw=1 \
     lpa.decode=false \
     ro.opengles.version=131072 \
-    debug.hwc.dynThreshold=1.9 \
     debug.egl.recordable.rgba8888=1
