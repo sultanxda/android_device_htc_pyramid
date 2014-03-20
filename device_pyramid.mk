@@ -229,12 +229,11 @@ PRODUCT_COPY_FILES += \
 PRODUCT_AAPT_CONFIG := normal hdpi
 PRODUCT_AAPT_PREF_CONFIG := hdpi
 
-# Common build properties
+# Hold precise GC data
+PRODUCT_TAGS += dalvik.gc.type-precise
+
+# Goo.im version
 PRODUCT_PROPERTY_OVERRIDES += \
-    ro.setupwizard.enable_bypass=1 \
-    dalvik.vm.lockprof.threshold=500 \
-    ro.com.google.locationfeatures=1 \
-    dalvik.vm.dexopt-flags=m=y \
     ro.goo.version=$(shell date +%s)
 
 # Qcom build properties
