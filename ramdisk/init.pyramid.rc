@@ -4,10 +4,11 @@ on init
     mkdir /storage/usbdisk 0000 system system
     mkdir /storage/sdcard0 0000 system system
 
+    export EXTERNAL_STORAGE /storage/sdcard0
+
     # for backwards compatibility
     symlink /storage/sdcard0 /sdcard
     symlink /storage/sdcard0 /mnt/sdcard
-    export EXTERNAL_STORAGE /storage/sdcard0
     symlink /storage/usbdisk /usbdisk
     symlink /storage/usbdisk /mnt/usbdisk
 
@@ -153,10 +154,6 @@ on boot
     # for slate charging timer
     chown radio /sys/class/power_supply/battery/charger_timer
 
-    # for flip to speaker
-    chown radio radio /sys/class/htc_accelerometer/accelerometer/PhoneOnOffFlag
-    chown radio radio /sys/class/htc_ecompass/ecompass/PhoneOnOffFlag
-
     #Vibrator
     chown system system /sys/devices/platform/msm_ssbi.0/pm8058-core/pm8xxx-vib/amp
     chmod 0660 /sys/devices/platform/msm_ssbi.0/pm8058-core/pm8xxx-vib/amp
@@ -176,10 +173,6 @@ on boot
     # allow Torch to write to flashlight file
     chmod 0660 /sys/class/leds/flashlight/brightness
 
-    # sync fs
-    chown system /sys/devices/platform/rs300000a7.65536/force_sync
-    chown system /sys/devices/platform/rs300000a7.65536/sync_sts
-
 # Services start here
 
 service dhcpcd_wlan0 /system/bin/dhcpcd -ABKL
@@ -192,11 +185,6 @@ service dhcpcd_bt-pan /system/bin/dhcpcd -ABKL
     disabled
     oneshot
 
-service hdmid /system/bin/hdmid
-    class main
-    socket hdmid stream 0660 root system graphics
-    disabled
-
 service htcbatt /system/bin/htcbatt
     class main
     user root
@@ -206,10 +194,6 @@ service iprenew_wlan0 /system/bin/dhcpcd -n
     disabled
     oneshot
 
-# service mpdecision /system/bin/mpdecision --no_sleep --avg_comp --single_core_while_panel_off
-  # user root
-   # disabled
-
 service netmgrd /system/bin/netmgrd
     class main
 
@@ -217,11 +201,6 @@ service qcom-post-boot /system/bin/sh /system/etc/init.qcom.post_boot.sh
     class main
     user root
     disabled
-
-#service qcom-sh /system/bin/sh /init.qcom.sh
-#    class core
-#    user root
-#    oneshot
 
 service qmuxd /system/bin/qmuxd
     class main
@@ -231,11 +210,6 @@ service qmuxd /system/bin/qmuxd
 service rmt_storage /system/bin/rmt_storage /dev/block/mmcblk0p26 /dev/block/mmcblk0p27 /dev/block/mmcblk0p18
     class core
     user root
-
-# service thermald /system/bin/thermald
-#    user root
-#    group root
-#    disabled
 
 service wpa_supplicant /system/bin/wpa_supplicant -Dnl80211 -iwlan0 -c /data/misc/wifi/wpa_supplicant.conf
     user root

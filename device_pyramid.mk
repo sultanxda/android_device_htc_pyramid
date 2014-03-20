@@ -73,7 +73,6 @@ PRODUCT_COPY_FILES += \
     device/htc/pyramid/dsp/CodecDSPID.txt:system/etc/CodecDSPID.txt \
     device/htc/pyramid/dsp/CodecDSPID_WB.txt:system/etc/CodecDSPID_WB.txt \
     device/htc/pyramid/dsp/TPA2051_CFG.csv:system/etc/TPA2051_CFG.csv \
-    device/htc/pyramid/dsp/TPA2051_CFG_XC.csv:system/etc/TPA2051_CFG_XC.csv \
     device/htc/pyramid/dsp/soundimage/Sound_MFG.txt:system/etc/soundimage/Sound_MFG.txt \
     device/htc/pyramid/dsp/soundimage/Sound_Original_Recording.txt:system/etc/soundimage/Sound_Original_Recording.txt \
     device/htc/pyramid/dsp/soundimage/Sound_Original_SPK.txt:system/etc/soundimage/Sound_Original_SPK.txt \
@@ -228,21 +227,16 @@ PRODUCT_COPY_FILES += \
 PRODUCT_AAPT_CONFIG := normal hdpi
 PRODUCT_AAPT_PREF_CONFIG := hdpi
 
-# Common build properties
+# Hold precise GC data
+PRODUCT_TAGS += dalvik.gc.type-precise
+
+# Goo.im version
 PRODUCT_PROPERTY_OVERRIDES += \
-    ro.setupwizard.enable_bypass=1 \
-    dalvik.vm.lockprof.threshold=500 \
-    ro.com.google.locationfeatures=1 \
-    dalvik.vm.dexopt-flags=m=y \
     ro.goo.version=$(shell date +%s)
 
 # Qcom build properties
 PRODUCT_PROPERTY_OVERRIDES += \
     com.qc.hardware=true \
-    debug.mdpcomp.maxlayer=3 \
-    debug.mdpcomp.logs=0 \
-    debug.egl.hw=1 \
-    debug.sf.hw=1 \
+    lpa.decode=false \
     ro.opengles.version=131072 \
-    debug.hwc.dynThreshold=1.9 \
     debug.egl.recordable.rgba8888=1
