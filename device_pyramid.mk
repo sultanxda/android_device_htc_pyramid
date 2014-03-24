@@ -47,7 +47,8 @@ PRODUCT_COPY_FILES += \
 
 # Misc configuration files
 PRODUCT_COPY_FILES += \
-    device/htc/pyramid/configs/89z_kernel:system/etc/init.d/89z_kernel
+    device/htc/pyramid/configs/89z_kernel:system/etc/init.d/89z_kernel \
+    device/htc/pyramid/configs/98netflix:system/etc/init.d/98netflix
 
 # Keylayouts and Keychars
 PRODUCT_COPY_FILES += \
