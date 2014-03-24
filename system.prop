@@ -40,9 +40,10 @@ ro.goo.board=pyramid
 ro.ril.disable.power.collapse=0
 pm.sleep_mode=1
 #
-# USB
+# Misc
 #
 persist.sys.usb.config=mtp,adb
+ro.vold.umsdirtyratio=50
 #
 # Disable-kernel-error-report
 #
