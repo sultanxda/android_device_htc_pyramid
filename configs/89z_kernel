@@ -1,7 +1,13 @@
 #!/system/bin/sh
 
 #### Change your own settings here ###
- 
+
+## Fastcharge
+# 0 = Disabled
+# 1 = Enabled on everything
+# 2 = Enabled on everything except USB
+FASTCHARGE=0;
+
 ## Sweep2Wake
 # 0 = Disabled
 # 1 = Enabled
@@ -17,7 +23,6 @@ SWEEP=0;
 PANEL_UV=250;
 
 ## 3D GPU max frequency
-# 177778000 = 177MHz
 # 200000000 = 200MHz
 # 228571000 = 228MHz
 # 266667000 = 267MHz
@@ -51,6 +56,10 @@ MSM=1;
 BACK=3;
 
 ####### DO NOT CHANGE ANYTHING BELOW THIS LINE #######
+
+# Config fastcharge' >> /system/etc/init.d/89z_kernel;
+chmod 664 /sys/kernel/fast_charge/force_fast_charge
+echo "$FASTCHARGE" > /sys/kernel/fast_charge/force_fast_charge
 
 # Config Sweep2Wake
 chmod 664 /sys/android_touch/sweep2wake
