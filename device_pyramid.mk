@@ -239,6 +239,5 @@ PRODUCT_PROPERTY_OVERRIDES += \
 # Qcom build properties
 PRODUCT_PROPERTY_OVERRIDES += \
     com.qc.hardware=true \
-    lpa.decode=false \
     ro.opengles.version=131072 \
     debug.egl.recordable.rgba8888=1
