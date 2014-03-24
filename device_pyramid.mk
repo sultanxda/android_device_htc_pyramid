@@ -154,7 +154,6 @@ PRODUCT_COPY_FILES += \
 
 # Graphics
 PRODUCT_PACKAGES += \
-    copybit.msm8660 \
     gralloc.msm8660 \
     hwcomposer.msm8660 \
     memtrack.msm8660 \
