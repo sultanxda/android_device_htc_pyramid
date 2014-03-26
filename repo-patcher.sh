@@ -8,4 +8,7 @@ patch -p1 < ../device/htc/pyramid/patches/build.patch
 cd ../frameworks/opt/telephony
 git reset --hard && git clean -f -d
 patch -p1 < ../../../device/htc/pyramid/patches/frameworks-opt-telephony.patch
+cd ../../../packages/providers/MediaProvider
+git reset --hard && git clean -f -d
+patch -p1 < ../../../device/htc/pyramid/patches/mediaprovider.patch
 cd ../../..
