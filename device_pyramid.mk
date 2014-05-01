@@ -176,7 +176,6 @@ PRODUCT_PACKAGES += \
     libOmxAmrEnc \
     libOmxQcelp13Enc \
     libOmxEvrcEnc \
-    libv8 \
     libOmxAmrEnc
 
 # Camera
