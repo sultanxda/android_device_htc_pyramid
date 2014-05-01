@@ -12,10 +12,10 @@
 /dev/pmem               0664    media       system
 
 # camera
+/dev/video*             0660    system      camera
 /dev/gemini0            0660    system      camera
 /dev/msm_camera/*       0660    system      camera
-/dev/pmem_smipool*      0660    system      camera
-/dev/pmem_camera*       0660    system      camera
+/dev/rawchip0           0660    system      system
 
 # DIAG device node is world readable/writable
 /dev/diag               0666    root        root
@@ -31,6 +31,7 @@
 
 # audio
 /dev/msm_acdb           0660    system      audio
+/dev/msm_adc            0660    system      audio
 /dev/codec_aic3254      0660    system      audio
 /dev/msm_audio_dev_ctrl 0660    system      audio
 /dev/msm_mp3            0660    system      audio
@@ -54,6 +55,7 @@
 /dev/msm_evrc_in        0660    system      audio
 /dev/msm_wma            0660    system      audio
 /dev/msm_wmapro         0660    system      audio
+/dev/msm_aac            0660    system      audio
 /dev/msm_aac_in         0660    system      audio
 /dev/msm_amrnb_in       0640    system      audio
 
@@ -75,7 +77,7 @@
 /dev/qmi0               0640    radio       radio
 /dev/qmi1               0640    radio       radio
 /dev/qmi2               0640    radio       radio
-
+/dev/usb_accessory      0660    root        usb
 /dev/msm_dsps           0660    system      system
 /dev/rtc0               0600    system      system
 
