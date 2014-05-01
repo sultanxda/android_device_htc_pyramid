@@ -19,19 +19,41 @@ lib/libaudioalsa.so
 lib/libhtc_acoustic.so
 
 # Camera
-lib/hw/camera.default.so
+lib/hw/camera.vendor.msm8660.so
+lib/libBeautyChat.so
+lib/libcam_oem_plugin.so
+lib/libcameraasd.so
 lib/libcameraface.so
 lib/libcamerapp.so
 lib/libgemini.so
-lib/libidl.so
+lib/libHTC_DIS.so
+lib/libhtccamera.so
+lib/libimage-jpeg-dec-omx-comp.so
+lib/libimage-jpeg-enc-omx-comp.so
+lib/libimage-omx-common.so
+lib/libmm-abl.so
+lib/libmm-abl-oem.so
+lib/libmmcamera_faceproc.so
+lib/libmmcamera_frameproc.so
+lib/libmmcamera_hdr_lib.so
+lib/libmmcamera_image_stab.so
+lib/libmmcamera_interface2.so
+lib/libmmcamera_rawchipproc.so
+lib/libmmcamera_statsproc31.so
+lib/libmmcamera_wavelet_lib.so
 lib/libmmipl.so
 lib/libmmjpeg.so
+lib/libmmmpo.so
+lib/libmmmpod.so
+lib/libmmstillomx.so
 lib/liboemcamera.so
-lib/libOlaEngine.so
 lib/libposteffect.so
+lib/libqcomomxsample_jb.so
+bin/mm-qcamera-daemon
 
 # Chromatix
 lib/libchromatix_s5k3h1gx_default_video.so
+lib/libchromatix_s5k3h1gx_hdr.so
 lib/libchromatix_s5k3h1gx_hfr.so
 lib/libchromatix_s5k3h1gx_preview.so
 lib/libchromatix_s5k3h1gx_zsl.so
@@ -42,9 +64,11 @@ lib/egl/libEGL_adreno200.so
 lib/egl/libGLESv1_CM_adreno200.so
 lib/egl/libGLESv2_adreno200.so
 lib/egl/libq3dtools_adreno200.so
+lib/egl/libplayback_adreno200.so
 lib/libC2D2.so
 lib/libc2d2_z180.so
 lib/libgsl.so
+lib/libOpenCL.so
 lib/libOpenVG.so
 lib/libsc-a2xx.so
 
@@ -53,6 +77,7 @@ lib/libmm-color-convertor.so
 
 # Radio
 lib/libdiag.so
+lib/libidl.so
 lib/libdll.so
 lib/libdsi_netctrl.so
 lib/libdsutils.so
@@ -68,3 +93,14 @@ lib/libmllite.so
 lib/libmlplatform.so
 lib/libmpl_jni.so
 lib/libmpl.so
+
+# WiFi
+etc/firmware/fw_bcmdhd.bin
+etc/firmware/fw_bcmdhd_apsta.bin
+
+# Video firmware
+etc/firmware/vidc_1080p.fw
+
+# Adreno firmware
+etc/firmware/leia_pfp_470.fw
+etc/firmware/leia_pm4_470.fw
