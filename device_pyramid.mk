@@ -240,4 +240,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PROPERTY_OVERRIDES += \
     com.qc.hardware=true \
     ro.opengles.version=131072 \
-    debug.egl.recordable.rgba8888=1
+    debug.egl.recordable.rgba8888=1 \
+    debug.sf.hw=1 \
+    debug.egl.hw=1
