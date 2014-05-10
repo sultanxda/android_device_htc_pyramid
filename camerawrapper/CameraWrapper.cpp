@@ -102,6 +102,9 @@ static char *camera_fixup_getparams(int id, const char *settings)
     params.dump();
 #endif
 
+    /* Disable continuous AF in camcorder;
+     * continuous AF isn't working properly, so
+     * it's ruining videos. */
     if (id==0)
 	params.set(android::CameraParameters::KEY_SUPPORTED_FOCUS_MODES, "auto,infinity,normal,macro,continuous-picture");
 
@@ -110,6 +113,11 @@ static char *camera_fixup_getparams(int id, const char *settings)
     params.set(android::CameraParameters::KEY_MAX_NUM_DETECTED_FACES_SW, "0");
     params.set(android::CameraParameters::KEY_FACE_DETECTION, "off");
     params.set("scene-detect", "on");
+
+    /* Disable video snapshot; this
+     * feature requires functional continuous
+     * AF in order to work properly. */
+    params.set(android::CameraParameters::KEY_VIDEO_SNAPSHOT_SUPPORTED, "false");
 
     /* Set correct caf-focus-mode */ 
     const char* focusAreas = params.get(android::CameraParameters::KEY_FOCUS_AREAS);
@@ -140,6 +148,9 @@ static char *camera_fixup_setparams(int id, const char *settings)
     params.dump();
 #endif
 
+    /* Disable continuous AF in camcorder;
+     * continuous AF isn't working properly, so
+     * it's ruining videos. */
     if (id==0)
 	params.set(android::CameraParameters::KEY_SUPPORTED_FOCUS_MODES, "auto,infinity,normal,macro,continuous-picture");
 
@@ -148,7 +159,12 @@ static char *camera_fixup_setparams(int id, const char *settings)
     params.set(android::CameraParameters::KEY_MAX_NUM_DETECTED_FACES_SW, "0");
     params.set(android::CameraParameters::KEY_FACE_DETECTION, "off");
     params.set("scene-detect", "on");
-    
+
+    /* Disable video snapshot; this
+     * feature requires functional continuous
+     * AF in order to work properly. */
+    params.set(android::CameraParameters::KEY_VIDEO_SNAPSHOT_SUPPORTED, "false");
+
     /* Set correct caf-focus-mode */
     const char* focusAreas = params.get(android::CameraParameters::KEY_FOCUS_AREAS);
 
