@@ -57,7 +57,7 @@ chmod 444 /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
 chmod 444 /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
 
 # Display undervolt
-echo "$PANEL_UV" > /sys/module/board_pyramid_panel/parameters/panel_uv
+echo "$PANEL_UV" > /sys/module/board_pyramid_display/parameters/panel_uv
 
 # Display colors
 echo "$COLORS" > /sys/module/mdp/parameters/mdp_gamma_cooler_colors
