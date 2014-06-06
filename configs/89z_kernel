@@ -8,6 +8,12 @@
 # 2 = Enabled on everything except USB
 FASTCHARGE=0;
 
+## Sweep2Wake
+# 0 = Disabled
+# 1 = Enabled
+# 2 = Enabled (with no button backlight)
+SWEEP=0;
+
 ## Display undervolt
 # Choose a value between
 # 0mV and 700mV that is a
@@ -47,6 +53,10 @@ BACK=3;
 # Fastcharge
 chmod 664 /sys/kernel/fast_charge/force_fast_charge
 echo "$FASTCHARGE" > /sys/kernel/fast_charge/force_fast_charge
+
+# Sweep2Wake
+chmod 664 /sys/android_touch/sweep2wake
+echo "$SWEEP" > /sys/android_touch/sweep2wake
 
 # CPU governor
 chmod 664 /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
