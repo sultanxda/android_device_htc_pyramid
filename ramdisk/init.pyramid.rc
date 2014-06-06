@@ -120,9 +120,6 @@ on boot
     mkdir /data/misc/wifi/wpa_supplicant 0770 wifi wifi
     mkdir /data/misc/dhcp 0770 dhcp dhcp
 
-    # symlink for HDMI
-    symlink /dev/graphics/fb1 /dev/graphics/hdmi
-
     # audio
     mkdir /data/audio 2770 media audio
 
@@ -178,17 +175,6 @@ on boot
 
     # allow Torch to write to flashlight file
     chmod 0660 /sys/class/leds/flashlight/brightness
-
-    # remove write permissions to video nodes
-    chmod 0664 /sys/devices/virtual/graphics/fb1/hpd
-    chmod 0664 /sys/devices/virtual/graphics/fb1/video_mode
-    chmod 0664 /sys/devices/virtual/graphics/fb1/format_3d
-
-    write /sys/module/subsystem_restart/parameters/restart_level 3
-
-    # change owner and group for media server and surfaceflinger
-    chown system system /sys/devices/virtual/graphics/fb1/format_3d
-    chown system system /sys/devices/virtual/graphics/fb1/hpd
 
     # sync fs
     chown system /sys/devices/platform/rs300000a7.65536/force_sync
