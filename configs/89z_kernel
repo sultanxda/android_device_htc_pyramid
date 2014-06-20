@@ -6,7 +6,7 @@
 # 0 = Disabled
 # 1 = Enabled on everything
 # 2 = Enabled on everything except USB
-FASTCHARGE=0;
+FASTCHARGE=1;
 
 ## Sweep2Wake
 # 0 = Disabled
@@ -20,7 +20,7 @@ SWEEP=0;
 # multiple of 25.
 # Undervolt will be
 # 3100mV -MINUS- (what you choose)
-PANEL_UV=400;
+PANEL_UV=0;
 
 ## Display color control
 # 0 = Regular colors
