@@ -4,4 +4,6 @@
 echo Resetting each repo...
 cd frameworks/opt/telephony
 git reset --hard && git clean -f -d
-cd ../../../
+cd ../../../packages/providers/MediaProvider
+git reset --hard && git clean -f -d
+cd ../../..
