@@ -242,6 +242,10 @@ service fuse_usbdisk /system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/usbdisk
     class late_start
     disabled
 
+service mpdecision /system/bin/mpdecision --no_sleep --avg_comp
+    user root
+    disabled
+
 on property:init.svc.bootanim=stopped
     start qcom-post-boot
 
