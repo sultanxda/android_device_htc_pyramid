@@ -232,10 +232,6 @@ PRODUCT_AAPT_PREF_CONFIG := hdpi
 # Hold precise GC data
 PRODUCT_TAGS += dalvik.gc.type-precise
 
-# Goo.im version
-PRODUCT_PROPERTY_OVERRIDES += \
-    ro.goo.version=$(shell date +%s)
-
 # Qcom build properties
 PRODUCT_PROPERTY_OVERRIDES += \
     com.qc.hardware=true \
