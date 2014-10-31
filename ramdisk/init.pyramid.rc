@@ -182,6 +182,10 @@ on boot
     chown system /sys/devices/platform/rs300000a7.65536/force_sync
     chown system /sys/devices/platform/rs300000a7.65536/sync_sts
 
+    # Color temp
+    chown system system /sys/module/mdp/parameters/mdp_gamma_cooler_colors
+    chmod 0664 /sys/module/mdp/parameters/mdp_gamma_cooler_colors
+
 on property:sys.boot_completed=1
     write /sys/module/rpm_resources/enable_low_power/L2_cache 1
     write /sys/module/rpm_resources/enable_low_power/pxo 1
