@@ -1,7 +1,9 @@
 import init.pyramid.usb.rc
 
-on init
+on early-init
+    write /sys/devices/system/cpu/cpu1/online 1
 
+on init
     mkdir /mnt/media_rw/sdcard0 0700 media_rw media_rw
     mkdir /mnt/media_rw/usbdisk 0700 media_rw media_rw
 
@@ -89,8 +91,6 @@ on post-fs-data
 
     # Set indication (checked by vold) that we have finished this action
     setprop vold.post_fs_data_done 1
-
-    write /sys/devices/system/cpu/cpu1/online 1
 
 on boot
     # Chown polling nodes as needed from UI running on system server
