@@ -119,6 +119,9 @@ static char *camera_fixup_getparams(int id, const char *settings)
      * AF in order to work properly. */
     params.set(android::CameraParameters::KEY_VIDEO_SNAPSHOT_SUPPORTED, "false");
 
+    /* Disable denoise */
+    params.set(android::CameraParameters::KEY_SUPPORTED_DENOISE, "off");
+
     /* Set correct caf-focus-mode */ 
     const char* focusAreas = params.get(android::CameraParameters::KEY_FOCUS_AREAS);
 
@@ -164,6 +167,9 @@ static char *camera_fixup_setparams(int id, const char *settings)
      * feature requires functional continuous
      * AF in order to work properly. */
     params.set(android::CameraParameters::KEY_VIDEO_SNAPSHOT_SUPPORTED, "false");
+
+    /* Disable denoise */
+    params.set(android::CameraParameters::KEY_SUPPORTED_DENOISE, "off");
 
     /* Set correct caf-focus-mode */
     const char* focusAreas = params.get(android::CameraParameters::KEY_FOCUS_AREAS);
