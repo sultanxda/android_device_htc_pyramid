@@ -143,7 +143,6 @@ PRODUCT_PACKAGES += \
     audio.a2dp.default \
     audio_policy.msm8660 \
     audio.primary.msm8660 \
-    audio_policy.conf \
     libaudioutils \
     libaudio-resampler \
     audio.usb.default
@@ -205,6 +204,10 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     make_ext4fs \
     setup_fs
+
+# Audio policy configuration
+PRODUCT_COPY_FILES += \
+    device/htc/pyramid/configs/audio_policy.conf:system/etc/audio_policy.conf
 
 # Media configuration
 PRODUCT_COPY_FILES += \
