@@ -190,10 +190,6 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     libnetcmdiface
 
-# GooManager
-PRODUCT_PACKAGES += \
-    GooManager
-
 # Torch
 PRODUCT_PACKAGES += \
     Torch
