@@ -201,6 +201,7 @@ on property:sys.boot_completed=1
     chown system /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq
     chown system /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq
     chown system /sys/devices/system/cpu/cpufreq/ondemand/down_differential
+    chown system /sys/devices/system/cpu/cpufreq/ondemand/down_differential_multi_core
     chown system /sys/devices/system/cpu/cpufreq/ondemand/input_boost
     chown system /sys/devices/system/cpu/cpufreq/ondemand/io_is_busy
     chown system /sys/devices/system/cpu/cpufreq/ondemand/optimal_freq
@@ -210,17 +211,18 @@ on property:sys.boot_completed=1
     chown system /sys/devices/system/cpu/cpufreq/ondemand/sync_freq
     chown system /sys/devices/system/cpu/cpufreq/ondemand/up_threshold
     chown system /sys/devices/system/cpu/cpufreq/ondemand/up_threshold_any_cpu_load
-    write /sys/devices/system/cpu/cpufreq/ondemand/up_threshold 90
-    write /sys/devices/system/cpu/cpufreq/ondemand/io_is_busy 1
-    write /sys/devices/system/cpu/cpufreq/ondemand/sampling_down_factor 2
+    chown system /sys/devices/system/cpu/cpufreq/ondemand/up_threshold_multi_core
     write /sys/devices/system/cpu/cpufreq/ondemand/down_differential 10
-    write /sys/devices/system/cpu/cpufreq/ondemand/up_threshold_multi_core 70
     write /sys/devices/system/cpu/cpufreq/ondemand/down_differential_multi_core 3
-    write /sys/devices/system/cpu/cpufreq/ondemand/optimal_freq 918000
-    write /sys/devices/system/cpu/cpufreq/ondemand/sync_freq 1026000
-    write /sys/devices/system/cpu/cpufreq/ondemand/up_threshold_any_cpu_load 80
-    write /sys/devices/system/cpu/cpufreq/ondemand/input_boost 1134000
+    write /sys/devices/system/cpu/cpufreq/ondemand/input_boost 1242000
+    write /sys/devices/system/cpu/cpufreq/ondemand/io_is_busy 1
+    write /sys/devices/system/cpu/cpufreq/ondemand/optimal_freq 972000
+    write /sys/devices/system/cpu/cpufreq/ondemand/sampling_down_factor 2
     write /sys/devices/system/cpu/cpufreq/ondemand/sampling_rate 50000
+    write /sys/devices/system/cpu/cpufreq/ondemand/sync_freq 1080000
+    write /sys/devices/system/cpu/cpufreq/ondemand/up_threshold 85
+    write /sys/devices/system/cpu/cpufreq/ondemand/up_threshold_any_cpu_load 75
+    write /sys/devices/system/cpu/cpufreq/ondemand/up_threshold_multi_core 65
     write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "ondemand"
     write /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor "ondemand"
     chown root.system /sys/devices/system/cpu/mfreq
