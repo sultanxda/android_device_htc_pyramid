@@ -2,12 +2,6 @@
 
 ### Change your own settings here ###
 
-## Fastcharge
-# 0 = Disabled
-# 1 = Enabled on everything
-# 2 = Enabled on everything except USB
-FASTCHARGE=1;
-
 ## Sweep2Wake
 # 0 = Disabled
 # 1 = Enabled
@@ -37,10 +31,6 @@ GPU=266667000;
 
 ## Maximum CPU frequency
 MAXFREQ=1512000;
-
-## Maximum CPU frequency for EACH core
-MAX0=;
-MAX1=;
 
 ## Capacitive-button backlight brightness
 # 1 = Backlight disabled
@@ -77,8 +67,6 @@ chmod 664 /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
 chmod 664 /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq
 echo "$MAXFREQ" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
 echo "$MAXFREQ" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq
-echo "$MAX0" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
-echo "$MAX1" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq
 
 # Maximum GPU frequency
 chmod 664 /sys/devices/platform/kgsl-3d0.0/kgsl/kgsl-3d0/max_gpuclk
