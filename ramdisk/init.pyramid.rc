@@ -259,11 +259,6 @@ service iprenew_wlan0 /system/bin/dhcpcd -n
 service netmgrd /system/bin/netmgrd
     class main
 
-service qcom-post-boot /system/bin/sh /system/etc/init.qcom.post_boot.sh
-    class main
-    user root
-    disabled
-
 service qmuxd /system/bin/qmuxd
     class main
     user radio
