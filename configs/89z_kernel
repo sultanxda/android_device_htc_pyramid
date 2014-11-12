@@ -40,21 +40,9 @@ BACK=3;
 
 ####### DO NOT CHANGE ANYTHING BELOW THIS LINE #######
 
-# Fastcharge
-chmod 664 /sys/kernel/fast_charge/force_fast_charge
-echo "$FASTCHARGE" > /sys/kernel/fast_charge/force_fast_charge
-
 # Sweep2Wake
 chmod 664 /sys/android_touch/sweep2wake
 echo "$SWEEP" > /sys/android_touch/sweep2wake
-
-# CPU governor
-chmod 664 /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-chmod 664 /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
-echo "$GOV" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-echo "$GOV" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
-chmod 444 /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-chmod 444 /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
 
 # Display undervolt
 echo "$PANEL_UV" > /sys/module/board_pyramid_display/parameters/panel_uv
@@ -64,9 +52,7 @@ echo "$COLORS" > /sys/module/mdp/parameters/mdp_gamma_cooler_colors
 
 # Maximum CPU frequency
 chmod 664 /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
-chmod 664 /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq
 echo "$MAXFREQ" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
-echo "$MAXFREQ" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq
 
 # Maximum GPU frequency
 chmod 664 /sys/devices/platform/kgsl-3d0.0/kgsl/kgsl-3d0/max_gpuclk
