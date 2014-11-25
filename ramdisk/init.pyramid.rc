@@ -70,6 +70,7 @@ on init
 on fs
     # mount all mmc partitions
     mount_all /fstab.pyramid
+    swapon_all /fstab.pyramid
 
     setprop ro.crypto.tmpfs_options size=128m,mode=0771,uid=1000,gid=1000
 
@@ -185,6 +186,15 @@ on boot
     # Color temp
     chown system system /sys/module/mdp/parameters/mdp_gamma_cooler_colors
     chmod 0664 /sys/module/mdp/parameters/mdp_gamma_cooler_colors
+
+    # zRAM (read only 1 page at a time)
+    write /proc/sys/vm/page-cluster 0
+
+    # KSM
+    write /sys/kernel/mm/ksm/pages_to_scan 100
+    write /sys/kernel/mm/ksm/sleep_millisecs 500
+    write /sys/kernel/mm/ksm/deferred_timer 1
+    write /sys/kernel/mm/ksm/run 1
 
 on property:sys.boot_completed=1
     write /sys/module/rpm_resources/enable_low_power/L2_cache 1
