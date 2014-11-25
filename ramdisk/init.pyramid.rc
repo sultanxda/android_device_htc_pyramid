@@ -227,8 +227,8 @@ on property:sys.boot_completed=1
     write /sys/devices/system/cpu/cpufreq/ondemand/up_threshold 85
     write /sys/devices/system/cpu/cpufreq/ondemand/up_threshold_any_cpu_load 75
     write /sys/devices/system/cpu/cpufreq/ondemand/up_threshold_multi_core 65
-    write /sys/module/cpu_boost_framework/parameters/input_boost_freq 1296000
-    write /sys/module/cpu_boost_framework/parameters/input_boost_ms 2500
+    write /sys/module/cpu_input_boost/parameters/input_boost_freq 1134000
+    write /sys/module/cpu_input_boost/parameters/input_boost_ms 1500
     chown root.system /sys/devices/system/cpu/mfreq
     chmod 220 /sys/devices/system/cpu/mfreq
     chown root.system /sys/devices/system/cpu/cpu1/online
