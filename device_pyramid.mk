@@ -225,4 +225,5 @@ PRODUCT_PROPERTY_OVERRIDES += \
     debug.mdpcomp.logs=0 \
     debug.mdpcomp.maxlayer=3 \
     debug.sf.hw=1 \
-    ro.opengles.version=131072
+    ro.opengles.version=131072 \
+    ro.vendor.extension_library=/system/lib/libqc-opt.so
