@@ -191,7 +191,6 @@ on property:sys.boot_completed=1
     write /sys/module/rpm_resources/enable_low_power/pxo 1
     write /sys/module/rpm_resources/enable_low_power/vdd_dig 2
     write /sys/module/rpm_resources/enable_low_power/vdd_mem 2
-    write /sys/module/rpm_resources/enable_low_power/rpm_cpu 1
     write /sys/module/pm_8x60/modes/cpu0/power_collapse/suspend_enabled 1
     write /sys/module/pm_8x60/modes/cpu1/power_collapse/suspend_enabled 1
     write /sys/module/pm_8x60/modes/cpu0/standalone_power_collapse/suspend_enabled 1
@@ -228,7 +227,7 @@ on property:sys.boot_completed=1
     write /sys/devices/system/cpu/cpufreq/ondemand/up_threshold_any_cpu_load 75
     write /sys/devices/system/cpu/cpufreq/ondemand/up_threshold_multi_core 65
     write /sys/module/cpu_input_boost/parameters/input_boost_freq 1134000
-    write /sys/module/cpu_input_boost/parameters/input_boost_ms 1500
+    write /sys/module/cpu_input_boost/parameters/input_boost_ms 900
     chown root.system /sys/devices/system/cpu/mfreq
     chmod 220 /sys/devices/system/cpu/mfreq
     chown root.system /sys/devices/system/cpu/cpu1/online
