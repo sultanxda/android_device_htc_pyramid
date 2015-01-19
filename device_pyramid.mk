@@ -37,14 +37,6 @@ PRODUCT_COPY_FILES += \
     device/htc/pyramid/ramdisk/init.pyramid.usb.rc:root/init.pyramid.usb.rc \
     device/htc/pyramid/ramdisk/ueventd.pyramid.rc:root/ueventd.pyramid.rc
 
-# Recovery and custom charging
-PRODUCT_COPY_FILES += \
-    device/htc/pyramid/recovery/sbin/choice_fn:recovery/root/sbin/choice_fn \
-    device/htc/pyramid/recovery/sbin/power_test:recovery/root/sbin/power_test \
-    device/htc/pyramid/recovery/sbin/offmode_charging:recovery/root/sbin/offmode_charging \
-    device/htc/pyramid/recovery/sbin/detect_key:recovery/root/sbin/detect_key \
-    device/htc/pyramid/recovery/sbin/htcbatt:recovery/root/sbin/htcbatt
-
 # Misc configuration files
 PRODUCT_COPY_FILES += \
     device/htc/pyramid/configs/89z_kernel:system/etc/init.d/89z_kernel
@@ -136,7 +128,7 @@ PRODUCT_COPY_FILES += \
 # WiFi
 $(call inherit-product-if-exists, hardware/broadcom/wlan/bcmdhd/firmware/bcm4329/device-bcm.mk)
 PRODUCT_COPY_FILES += \
-    device/htc/pyramid/wpa_supplicant_overlay.conf:system/etc/wifi/wpa_supplicant_overlay.conf
+    device/htc/pyramid/configs/wpa_supplicant_overlay.conf:system/etc/wifi/wpa_supplicant_overlay.conf
 
 # Audio
 PRODUCT_PACKAGES += \
@@ -156,33 +148,27 @@ PRODUCT_PACKAGES += \
     copybit.msm8660 \
     gralloc.msm8660 \
     hwcomposer.msm8660 \
-    memtrack.msm8660 \
-    lights.msm8660 \
     libgenlock \
-    libmemalloc \
-    liboverlay \
-    libqdutils \
-    libtilerenderer
+    lights.msm8660
 
 # OMX
 PRODUCT_PACKAGES += \
+    libc2dcolorconvert \
+    libdashplayer \
     libdivxdrmdecrypt \
     libmm-omxcore \
-    libc2dcolorconvert \
     libOmxCore \
     libOmxVdec \
     libOmxVenc \
-    libOmxAacEnc \
-    libOmxAmrEnc \
-    libOmxQcelp13Enc \
-    libOmxEvrcEnc \
-    libOmxAmrEnc
+    libstagefrighthw \
+    qcmediaplayer
+
+PRODUCT_BOOT_JARS += \
+    qcmediaplayer
 
 # Camera
 PRODUCT_PACKAGES += \
-    camera.msm8660 \
-    libsurfaceflinger_client \
-    libstagefrighthw
+    camera.msm8660
 
 # Net
 PRODUCT_PACKAGES += \
@@ -233,7 +219,10 @@ PRODUCT_TAGS += dalvik.gc.type-precise
 # Qcom build properties
 PRODUCT_PROPERTY_OVERRIDES += \
     com.qc.hardware=true \
-    ro.opengles.version=131072 \
+    debug.egl.hw=1 \
     debug.egl.recordable.rgba8888=1 \
+    debug.hwc.dynThreshold=1.9 \
+    debug.mdpcomp.logs=0 \
+    debug.mdpcomp.maxlayer=3 \
     debug.sf.hw=1 \
-    debug.egl.hw=1
+    ro.opengles.version=131072
